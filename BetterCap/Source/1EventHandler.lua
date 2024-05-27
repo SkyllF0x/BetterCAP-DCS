@@ -48,7 +48,7 @@ function EventHandler:create()
   
   function EventHandler:shutdown() 
     world.removeEventHandler(self)
-    EventHandler._instance = nil
+    EventHandler._inst = nil
   end
 
 -------------------------------------------------------------------

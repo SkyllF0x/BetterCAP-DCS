@@ -1,5 +1,5 @@
----Better CAP version: 0.1.0 |build 1 | Build time: 27.05.2024 1503Z---
-env.info("Better CAP version: 0.1.0 |build 1 | Build time: 27.05.2024 1503Z")
+---Better CAP version: 0.1.0 |build 2 | Build time: 27.05.2024 1506Z---
+env.info("Better CAP version: 0.1.0 |build 2 | Build time: 27.05.2024 1506Z")
 ---------------------------------------------------------------------------
 ---------------------------------------------------------------------------
 --     Source file: 0Utility.lua
@@ -569,7 +569,7 @@ function EventHandler:create()
   
   function EventHandler:shutdown() 
     world.removeEventHandler(self)
-    EventHandler._instance = nil
+    EventHandler._inst = nil
   end
 
 -------------------------------------------------------------------
