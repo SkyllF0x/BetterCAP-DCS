@@ -1,0 +1,1318 @@
+airbaseParking = {
+	[1] = 
+	{
+		["Term_Index"] = 93,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -4427.916015625,
+			["z"] = 243999.515625,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 16,
+		["fDistToRW"] = 0,
+	}, -- end of [1]
+	[2] = 
+	{
+		["Term_Index"] = 92,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5326.7529296875,
+			["z"] = 244542.609375,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 1391.0972900391,
+	}, -- end of [2]
+	[3] = 
+	{
+		["Term_Index"] = 91,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5354.6943359375,
+			["z"] = 244616,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 1360.8020019531,
+	}, -- end of [3]
+	[4] = 
+	{
+		["Term_Index"] = 90,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5292.3120117188,
+			["z"] = 244747.203125,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 1288.8701171875,
+	}, -- end of [4]
+	[5] = 
+	{
+		["Term_Index"] = 89,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5239.4360351562,
+			["z"] = 244835.453125,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 1349.0710449219,
+	}, -- end of [5]
+	[6] = 
+	{
+		["Term_Index"] = 88,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5273.0068359375,
+			["z"] = 244631.796875,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 1330.0500488281,
+	}, -- end of [6]
+	[7] = 
+	{
+		["Term_Index"] = 87,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5211.3549804688,
+			["z"] = 244762.734375,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 1318.7059326172,
+	}, -- end of [7]
+	[8] = 
+	{
+		["Term_Index"] = 86,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5004.98046875,
+			["z"] = 244854.046875,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 1109.2052001953,
+	}, -- end of [8]
+	[9] = 
+	{
+		["Term_Index"] = 85,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -4880.447265625,
+			["z"] = 244968.734375,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 1283.4959716797,
+	}, -- end of [9]
+	[10] = 
+	{
+		["Term_Index"] = 84,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -4847.0278320312,
+			["z"] = 244870.671875,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 1220.1118164062,
+	}, -- end of [10]
+	[11] = 
+	{
+		["Term_Index"] = 83,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -4931.6782226562,
+			["z"] = 244826.203125,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 1076.171875,
+	}, -- end of [11]
+	[12] = 
+	{
+		["Term_Index"] = 82,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -4806.8271484375,
+			["z"] = 244941.375,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 1248.2550048828,
+	}, -- end of [12]
+	[13] = 
+	{
+		["Term_Index"] = 81,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -4751.1293945312,
+			["z"] = 244810.375,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 1172.9582519531,
+	}, -- end of [13]
+	[14] = 
+	{
+		["Term_Index"] = 80,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -4719.0668945312,
+			["z"] = 244710.125,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 1236.8666992188,
+	}, -- end of [14]
+	[15] = 
+	{
+		["Term_Index"] = 79,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -4999.859375,
+			["z"] = 244409.109375,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 898.49151611328,
+	}, -- end of [15]
+	[16] = 
+	{
+		["Term_Index"] = 78,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -4968.3100585938,
+			["z"] = 244309.828125,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 836.11767578125,
+	}, -- end of [16]
+	[17] = 
+	{
+		["Term_Index"] = 77,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -4932.529296875,
+			["z"] = 244162.890625,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 939.04992675781,
+	}, -- end of [17]
+	[18] = 
+	{
+		["Term_Index"] = 76,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -4833.2495117188,
+			["z"] = 244254.3125,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 800.53558349609,
+	}, -- end of [18]
+	[19] = 
+	{
+		["Term_Index"] = 75,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -4758.4594726562,
+			["z"] = 244227.4375,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 830.0439453125,
+	}, -- end of [19]
+	[20] = 
+	{
+		["Term_Index"] = 74,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -4858.4965820312,
+			["z"] = 244134.140625,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 971.15875244141,
+	}, -- end of [20]
+	[21] = 
+	{
+		["Term_Index"] = 73,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -4792.0336914062,
+			["z"] = 244326.671875,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 767.27386474609,
+	}, -- end of [21]
+	[22] = 
+	{
+		["Term_Index"] = 72,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -4891.9521484375,
+			["z"] = 244234.578125,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 905.24017333984,
+	}, -- end of [22]
+	[23] = 
+	{
+		["Term_Index"] = 71,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -4926.8896484375,
+			["z"] = 244382.046875,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 868.19274902344,
+	}, -- end of [23]
+	[24] = 
+	{
+		["Term_Index"] = 70,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5098.1450195312,
+			["z"] = 244854.828125,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 1148.9908447266,
+	}, -- end of [24]
+	[25] = 
+	{
+		["Term_Index"] = 69,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5045.9018554688,
+			["z"] = 244796.109375,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 1112.1405029297,
+	}, -- end of [25]
+	[26] = 
+	{
+		["Term_Index"] = 68,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5116.3564453125,
+			["z"] = 244752.328125,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 1087.0313720703,
+	}, -- end of [26]
+	[27] = 
+	{
+		["Term_Index"] = 67,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5206.4555664062,
+			["z"] = 244595.46875,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 1233.0521240234,
+	}, -- end of [27]
+	[28] = 
+	{
+		["Term_Index"] = 66,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5136.349609375,
+			["z"] = 244639.625,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 1206.2741699219,
+	}, -- end of [28]
+	[29] = 
+	{
+		["Term_Index"] = 65,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5669.6904296875,
+			["z"] = 242131.4375,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 2775.029296875,
+	}, -- end of [29]
+	[30] = 
+	{
+		["Term_Index"] = 64,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.000038146973,
+			["x"] = -5802.478515625,
+			["z"] = 242106.84375,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 2916.1984863281,
+	}, -- end of [30]
+	[31] = 
+	{
+		["Term_Index"] = 63,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5695.7739257812,
+			["z"] = 242030.703125,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 2835.8991699219,
+	}, -- end of [31]
+	[32] = 
+	{
+		["Term_Index"] = 62,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5828.84375,
+			["z"] = 242005.625,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 2977.318359375,
+	}, -- end of [32]
+	[33] = 
+	{
+		["Term_Index"] = 61,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5742.6791992188,
+			["z"] = 242093.140625,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 2804.2963867188,
+	}, -- end of [33]
+	[34] = 
+	{
+		["Term_Index"] = 60,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5875.41796875,
+			["z"] = 242068.25,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 2944.5720214844,
+	}, -- end of [34]
+	[35] = 
+	{
+		["Term_Index"] = 59,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.000045776367,
+			["x"] = -5751.3354492188,
+			["z"] = 241960.765625,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 3363.9663085938,
+	}, -- end of [35]
+	[36] = 
+	{
+		["Term_Index"] = 58,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5819.0512695312,
+			["z"] = 241880.71875,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 3301.287109375,
+	}, -- end of [36]
+	[37] = 
+	{
+		["Term_Index"] = 57,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5927.2529296875,
+			["z"] = 241774.65625,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 3402.2814941406,
+	}, -- end of [37]
+	[38] = 
+	{
+		["Term_Index"] = 56,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5796.9306640625,
+			["z"] = 241737.203125,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 3259.654296875,
+	}, -- end of [38]
+	[39] = 
+	{
+		["Term_Index"] = 55,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5913.7446289062,
+			["z"] = 241698.109375,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 3434.0480957031,
+	}, -- end of [39]
+	[40] = 
+	{
+		["Term_Index"] = 54,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5845.3852539062,
+			["z"] = 241776.546875,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 3372.7197265625,
+	}, -- end of [40]
+	[41] = 
+	{
+		["Term_Index"] = 53,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5736.34765625,
+			["z"] = 241883.515625,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 3332.19140625,
+	}, -- end of [41]
+	[42] = 
+	{
+		["Term_Index"] = 52,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5714.298828125,
+			["z"] = 241738.59375,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 3231.2456054688,
+	}, -- end of [42]
+	[43] = 
+	{
+		["Term_Index"] = 51,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5783.3603515625,
+			["z"] = 241659.671875,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 3292.7807617188,
+	}, -- end of [43]
+	[44] = 
+	{
+		["Term_Index"] = 50,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5482.2333984375,
+			["z"] = 241466.25,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 3459.9799804688,
+	}, -- end of [44]
+	[45] = 
+	{
+		["Term_Index"] = 49,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5518.6357421875,
+			["z"] = 241688.34375,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 3328.6616210938,
+	}, -- end of [45]
+	[46] = 
+	{
+		["Term_Index"] = 48,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5496.1748046875,
+			["z"] = 241543.984375,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 3427.0725097656,
+	}, -- end of [46]
+	[47] = 
+	{
+		["Term_Index"] = 47,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5450.541015625,
+			["z"] = 241767.296875,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 3390.4702148438,
+	}, -- end of [47]
+	[48] = 
+	{
+		["Term_Index"] = 46,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5319.2124023438,
+			["z"] = 241730.3125,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 3532.2131347656,
+	}, -- end of [48]
+	[49] = 
+	{
+		["Term_Index"] = 45,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5413.4799804688,
+			["z"] = 241545.640625,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 3398.3298339844,
+	}, -- end of [49]
+	[50] = 
+	{
+		["Term_Index"] = 44,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5436.5092773438,
+			["z"] = 241690.796875,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 3358.6877441406,
+	}, -- end of [50]
+	[51] = 
+	{
+		["Term_Index"] = 43,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -4557.5966796875,
+			["z"] = 244301.9375,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 389.22045898438,
+	}, -- end of [51]
+	[52] = 
+	{
+		["Term_Index"] = 42,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -4596.4379882812,
+			["z"] = 244347.6875,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 449.30059814453,
+	}, -- end of [52]
+	[53] = 
+	{
+		["Term_Index"] = 41,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -4635.1948242188,
+			["z"] = 244393.515625,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 509.36950683594,
+	}, -- end of [53]
+	[54] = 
+	{
+		["Term_Index"] = 40,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -4674.0434570312,
+			["z"] = 244439.21875,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 569.24267578125,
+	}, -- end of [54]
+	[55] = 
+	{
+		["Term_Index"] = 39,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.000045776367,
+			["x"] = -4712.8706054688,
+			["z"] = 244485,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 629.38360595703,
+	}, -- end of [55]
+	[56] = 
+	{
+		["Term_Index"] = 38,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -4751.6977539062,
+			["z"] = 244530.703125,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 689.15484619141,
+	}, -- end of [56]
+	[57] = 
+	{
+		["Term_Index"] = 37,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -4790.3916015625,
+			["z"] = 244576.5,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 749.24383544922,
+	}, -- end of [57]
+	[58] = 
+	{
+		["Term_Index"] = 36,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5011.9448242188,
+			["z"] = 242993.84375,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 1492.4331054688,
+	}, -- end of [58]
+	[59] = 
+	{
+		["Term_Index"] = 35,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -4967.1420898438,
+			["z"] = 243033.734375,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 1432.3664550781,
+	}, -- end of [59]
+	[60] = 
+	{
+		["Term_Index"] = 34,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -4875.501953125,
+			["z"] = 243114.484375,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 1310.4564208984,
+	}, -- end of [60]
+	[61] = 
+	{
+		["Term_Index"] = 33,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -4922.255859375,
+			["z"] = 243073.53125,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 1372.4281005859,
+	}, -- end of [61]
+	[62] = 
+	{
+		["Term_Index"] = 32,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -4785.935546875,
+			["z"] = 243194.328125,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 1190.3160400391,
+	}, -- end of [62]
+	[63] = 
+	{
+		["Term_Index"] = 31,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -4830.79296875,
+			["z"] = 243154.5625,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 1250.2023925781,
+	}, -- end of [63]
+	[64] = 
+	{
+		["Term_Index"] = 30,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -4741.4052734375,
+			["z"] = 243234.59375,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 1129.7800292969,
+	}, -- end of [64]
+	[65] = 
+	{
+		["Term_Index"] = 29,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5342.5141601562,
+			["z"] = 242694.53125,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 1942.6585693359,
+	}, -- end of [65]
+	[66] = 
+	{
+		["Term_Index"] = 28,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5238.2578125,
+			["z"] = 242787.984375,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 1801.7856445312,
+	}, -- end of [66]
+	[67] = 
+	{
+		["Term_Index"] = 27,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5253.1147460938,
+			["z"] = 242774.59375,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 1822.2054443359,
+	}, -- end of [67]
+	[68] = 
+	{
+		["Term_Index"] = 26,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5268.0561523438,
+			["z"] = 242761.203125,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 1842.2749023438,
+	}, -- end of [68]
+	[69] = 
+	{
+		["Term_Index"] = 25,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5282.7329101562,
+			["z"] = 242747.71875,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 1862.6168212891,
+	}, -- end of [69]
+	[70] = 
+	{
+		["Term_Index"] = 24,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5297.7846679688,
+			["z"] = 242734.53125,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 1882.4798583984,
+	}, -- end of [70]
+	[71] = 
+	{
+		["Term_Index"] = 23,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5312.7817382812,
+			["z"] = 242721.296875,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 1902.416015625,
+	}, -- end of [71]
+	[72] = 
+	{
+		["Term_Index"] = 22,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5327.6533203125,
+			["z"] = 242707.96875,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 1922.4860839844,
+	}, -- end of [72]
+	[73] = 
+	{
+		["Term_Index"] = 21,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5461.9453125,
+			["z"] = 242587.453125,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 2103.7514648438,
+	}, -- end of [73]
+	[74] = 
+	{
+		["Term_Index"] = 20,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5357.4453125,
+			["z"] = 242681.21875,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 1962.7062988281,
+	}, -- end of [74]
+	[75] = 
+	{
+		["Term_Index"] = 19,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5372.220703125,
+			["z"] = 242667.828125,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 1982.9063720703,
+	}, -- end of [75]
+	[76] = 
+	{
+		["Term_Index"] = 18,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5387.0405273438,
+			["z"] = 242654.359375,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 2003.1303710938,
+	}, -- end of [76]
+	[77] = 
+	{
+		["Term_Index"] = 17,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5401.8798828125,
+			["z"] = 242640.953125,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 2023.2763671875,
+	}, -- end of [77]
+	[78] = 
+	{
+		["Term_Index"] = 16,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5417.0126953125,
+			["z"] = 242627.859375,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 2043.0308837891,
+	}, -- end of [78]
+	[79] = 
+	{
+		["Term_Index"] = 15,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5431.9287109375,
+			["z"] = 242614.484375,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 2063.15234375,
+	}, -- end of [79]
+	[80] = 
+	{
+		["Term_Index"] = 14,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5446.7998046875,
+			["z"] = 242601.125,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 2083.2512207031,
+	}, -- end of [80]
+	[81] = 
+	{
+		["Term_Index"] = 13,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5521.3090820312,
+			["z"] = 242533.859375,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 2184.4177246094,
+	}, -- end of [81]
+	[82] = 
+	{
+		["Term_Index"] = 12,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5476.833984375,
+			["z"] = 242574.125,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 2123.8439941406,
+	}, -- end of [82]
+	[83] = 
+	{
+		["Term_Index"] = 11,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5491.6909179688,
+			["z"] = 242560.734375,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 2143.9814453125,
+	}, -- end of [83]
+	[84] = 
+	{
+		["Term_Index"] = 10,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.000038146973,
+			["x"] = -5506.6323242188,
+			["z"] = 242547.34375,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 2164.0876464844,
+	}, -- end of [84]
+	[85] = 
+	{
+		["Term_Index"] = 9,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5581.0903320312,
+			["z"] = 242480.671875,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 2264.5419921875,
+	}, -- end of [85]
+	[86] = 
+	{
+		["Term_Index"] = 8,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.000038146973,
+			["x"] = -5566.2290039062,
+			["z"] = 242494.109375,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 2244.2800292969,
+	}, -- end of [86]
+	[87] = 
+	{
+		["Term_Index"] = 7,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.000038146973,
+			["x"] = -5536.3608398438,
+			["z"] = 242520.671875,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 2204.2736816406,
+	}, -- end of [87]
+	[88] = 
+	{
+		["Term_Index"] = 6,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5551.3579101562,
+			["z"] = 242507.421875,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 2224.212890625,
+	}, -- end of [88]
+	[89] = 
+	{
+		["Term_Index"] = 5,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5388.4541015625,
+			["z"] = 241652.234375,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 3471.2053222656,
+	}, -- end of [89]
+	[90] = 
+	{
+		["Term_Index"] = 4,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5305.7182617188,
+			["z"] = 241654,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 3500.7158203125,
+	}, -- end of [90]
+	[91] = 
+	{
+		["Term_Index"] = 3,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -4696.5478515625,
+			["z"] = 243274.375,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 1069.5196533203,
+	}, -- end of [91]
+	[92] = 
+	{
+		["Term_Index"] = 2,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -5155.0776367188,
+			["z"] = 244536.28125,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 68,
+		["fDistToRW"] = 1269.2102050781,
+	}, -- end of [92]
+	[93] = 
+	{
+		["Term_Index"] = 1,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -4829.5249023438,
+			["z"] = 244622.0625,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 104,
+		["fDistToRW"] = 808.83020019531,
+	}, -- end of [93]
+	[94] = 
+	{
+		["Term_Index"] = 0,
+		["vTerminalPos"] = 
+		{
+			["y"] = 43.00004196167,
+			["x"] = -6396.9033203125,
+			["z"] = 242258.125,
+		}, -- end of ["vTerminalPos"]
+		["TO_AC"] = false,
+		["Term_Index_0"] = -1,
+		["Term_Type"] = 16,
+		["fDistToRW"] = 0,
+	}, -- end of [94]
+} -- end of airbase
