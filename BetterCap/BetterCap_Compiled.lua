@@ -1,5 +1,5 @@
----Better CAP version: 0.0.RC1 build 143 | Build time: 16.02.2024 2113Z---
-env.info("Better CAP version: 0.0.RC1 build 143 | Build time: 16.02.2024 2113Z")
+---Better CAP version: 0.1.0 |build 1 | Build time: 27.05.2024 1503Z---
+env.info("Better CAP version: 0.1.0 |build 1 | Build time: 27.05.2024 1503Z")
 ---------------------------------------------------------------------------
 ---------------------------------------------------------------------------
 --     Source file: 0Utility.lua
