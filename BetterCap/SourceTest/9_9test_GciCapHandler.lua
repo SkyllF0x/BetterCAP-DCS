@@ -77,17 +77,16 @@ function test_GciCapHandler:test_addSquadron()
   local sqn = self:getSqn(inst)
 
   --verify sqn added with key == sqnID
-  inst:addSquadron(sqn)
+  inst:addSquadron(sqn, true)
   lu.assertEquals(inst.squadrones, {[sqn:getID()] = sqn})
   
   --verify objective added
-  lu.assertEquals(inst.objectives, {sqn:getObjective()})
-  --verify it's same object
-  lu.assertEquals(tostring(inst.objectives[1]), tostring(sqn:getObjective()))
-  
-  --verify objective has only 1 sqn(it's original)
-  lu.assertEquals(#sqn:getObjective().squadrons, 1)
-  lu.assertEquals(tostring(sqn:getObjective().squadrons[1].squadron), tostring(sqn))
+  lu.assertEquals(#inst.objectives, 1)
+  --verify it's protect sqn
+  local v = sqn:getPoint()
+  lu.assertEquals(sqn:getPoint(), {x = 0, y = 0, z = 0})
+
+  lu.assertEquals(inst.objectives[1]:getPoint(), sqn:getPoint())
 end
 
 function test_GciCapHandler:test_addSquadronWO_objective() 
@@ -113,7 +112,8 @@ function test_GciCapHandler:test_addSquadron_sqnAddedToObjectives()
   inst:addObjective(obj2)
   lu.assertEquals(#inst.objectives, 2)
   
-  inst:addSquadron(sqn)
+  --sqn will also add objective on his home base
+  inst:addSquadron(sqn, true)
   lu.assertEquals(#inst.objectives, 3)
   
   --verify sqn was added to all objectives
@@ -128,8 +128,8 @@ function test_GciCapHandler:test_addObjective()
   --if priority same then added later -> place after other
   local inst = GciCapHandler:create(GciCapHandler.coalition.RED)
   
-  inst:addSquadron(self:getSqn(inst))
-  inst:addSquadron(self:getSqn(inst))
+  inst:addSquadron(self:getSqn(inst), true)
+  inst:addSquadron(self:getSqn(inst), true)
   
   --already has 2 objectives with low priority
   lu.assertEquals(#inst.objectives, 2)

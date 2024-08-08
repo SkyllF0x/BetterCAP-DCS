@@ -1,3 +1,5 @@
+--Sqn can be not created if unsopported type, but it's not a case here
+---@diagnostic disable: need-check-nil
 dofile(".\\BetterCap\\SourceTest\\00test_includes.lua")
 
 --mock coalition.addGroup and mist.getGroupTable
@@ -214,6 +216,21 @@ function test_CapSquadronGeneral:test_returnAircrafts()
   lu.assertEquals(inst:getCounter(), 12)
 end
 
+function test_CapSquadronGeneral:test_getObjective()
+  local inst = CapSquadronAir:create("1")
+  local val = inst:generateObjective(99999)
+  --same pos
+  lu.assertEquals(val:getPoint(), inst:getPoint())
+  lu.assertEquals(val.zone.point, mist.utils.makeVec2(inst:getPoint()))
+  --correct radius
+  lu.assertEquals(val.zone.radius, 99999)
+
+  --cap request disabled, gci enabled
+  lu.assertEquals(val.requestCap, false)
+  lu.assertEquals(val.requestGci, true)
+  --corrupt point bug
+  lu.assertEquals(inst:getPoint(), {x = 0, y = 0, z = 0})
+end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------

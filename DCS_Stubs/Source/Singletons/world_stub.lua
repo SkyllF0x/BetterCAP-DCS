@@ -82,31 +82,32 @@ function world:create()
   return setmetatable({}, {__index = self})
 end
 
-function world:addEventHandler(handler) 
+function world.addEventHandler(handler) 
   
 end
 
-function world:removeEventHandler(handler) 
+function world.removeEventHandler(handler) 
   
 end
 
-function world:getPlayer() 
+function world.getPlayer() 
   return {}
 end
 
-function world:getAirbases(coalitionId) 
+---@param coalitionId? number
+function world.getAirbases(coalitionId) 
   return {}
 end
 
-function world:searchObjects(objectCat, volume, handler, data) 
+function world.searchObjects(objectCat, volume, handler, data) 
   return {}
 end
 
-function world:getMarkPanels() 
+function world.getMarkPanels() 
   return {}
 end
 
-function world:removeJunk(searchVolume )
+function world.eventremoveJunk(searchVolume )
   return 0
   end
 return world

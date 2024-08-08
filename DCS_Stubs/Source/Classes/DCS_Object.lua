@@ -204,7 +204,8 @@ do
     return 1
   end
   
-  function Group.getByName() 
+
+  function Group.getByName(name) 
     return Group:create()
   end
 end

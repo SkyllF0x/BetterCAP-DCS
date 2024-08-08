@@ -27,7 +27,7 @@ function GroupRoute:create(groupR)
       --find airfield, check if it still avail
       local airfield = AirbaseWrapper:create(instance.waypoints[i].airdromeId) 
       
-      if airfield:isAvail() then 
+      if airfield and airfield:isAvail() then 
         instance.homeBase = mist.utils.deepCopy(instance.waypoints[i])
         instance.airbaseFinded = true
         break
@@ -38,7 +38,7 @@ function GroupRoute:create(groupR)
       --find carrier
       local carrier = CarrierWrapper:create(instance.waypoints[i].helipadId)
       
-      if carrier:isAvail() then 
+      if carrier and carrier:isAvail() then 
         instance.homeBase = mist.utils.deepCopy(instance.waypoints[i])
         instance.airbaseFinded = true
         break
@@ -425,7 +425,7 @@ function CapGroup:create(planes, originalName, route)
   instance.elements = {CapElement:create(planes)}
   instance.countPlanes = #planes
   
-  instance.name = originalName or "CapGroup-"..tostring(instance.id)
+  instance.name = originalName or ("CapGroup-"..tostring(instance.id))
   instance.id = utils.getGroupID()
   instance.typeName = planes[1]:getTypeName()
   
@@ -1355,7 +1355,7 @@ end
 function CapGroupRoute:getDebugStr(settings) 
   local message = CapGroup.getDebugStr(self, settings)
   
-  local idx = string.find(message, "\n")
+  local idx = string.find(message, "\n") or 0
   message = string.sub(message, 1, idx) .. utils.getMargin(4) .. "Objective: " .. self.objective:getName() .. string.sub(message, idx)
   
   return message

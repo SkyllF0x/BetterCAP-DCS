@@ -1,4 +1,3 @@
-
 utils = {}
 utils.generalID = 0 --used for internal purposes(i.e. zone ID or detector handler)
 utils.unitID = 0   -- for DCS UNIT

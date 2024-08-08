@@ -1,3 +1,5 @@
+
+---@meta "CapSquadronMeta"
 ----------------------------------------------------
 -- CapSquadron FSM, standart waiting, with aircraft
 ---prepared
@@ -122,7 +124,9 @@ function CapSquadronAir:create(prototypeGroupName, aircraftReady, aircraftAvail,
   instance.coalition = g:getCoalition()
   instance.country = g:getUnit(1):getCountry()
   
-  instance.prototypeTable = mist.getGroupTable(prototypeGroupName)
+  ---@type GroupTable
+  ---@diagnostic disable-next-line: assign-type-mismatch 
+  instance.prototypeTable = mist.getGroupTable(prototypeGroupName)--name check in caller, always return valid table
   instance.prototypeTable.task = "CAP"
   instance.prototypeTable.uncontrolled = nil
   instance.prototypeTable.lateActivation = nil
@@ -172,17 +176,15 @@ function CapSquadronAir:create(prototypeGroupName, aircraftReady, aircraftAvail,
   }
   instance.goLiveThreshold = 2
   
-  --objective used for cover this sqn spawn point
-  instance.objective = CapObjective:create(
-    instance.point, CircleZone:create(instance.point, 100000), true, true, CapObjective.Priority.Low, instance.name .. "-home")
-  instance.objective:addSquadron(instance)
-  instance.useObjective = true --should handler add objective from this sqn
-  
   return instance
 end
 
-function CapSquadronAir:setObjectiveUse(val)
-  self.useObjective = val
+--generate objective at sqn start point with CircleZone with radius R(default is 200km)
+--objective by default request only GCI
+function CapSquadronAir:generateObjective(R)
+    local radius = R or 200000
+    local pos = mist.utils.deepCopy(self:getPoint())--can corrupt point when creates
+    return CapObjective:create(pos, CircleZone:create(pos, radius), false, true, nil, self:getName() .. "-home")
 end
 
 function CapSquadronAir:setPriority(priority) 
@@ -229,14 +231,6 @@ end
 
 function CapSquadronAir:getPriorityModifier() 
   return self.priority
-end
-
-function CapSquadronAir:getObjective() 
-  return self.objective
-end
-
-function CapSquadronAir:objectiveActive() 
-  return self.useObjective
 end
 
 --valid wp to spawn point

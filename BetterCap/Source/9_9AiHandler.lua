@@ -54,7 +54,7 @@ function AbstractMainloop:addAwacs(awacsUnit)
     utils.printToSim(awacsUnit:getName() .. " AWACS WITH WRONG COALITION")
     return
    elseif not (awacsUnit:hasAttribute('AWACS')) then 
-    utils.printToSim(radar:getName() .. " IS NOT A AWACS")
+    utils.printToSim(awacsUnit:getName() .. " IS NOT A AWACS")
     return
   end
   
@@ -228,10 +228,17 @@ function AiHandler:addGroup(group)
 
   if not rawget(utils.PlanesTypes, group:getUnit(1):getTypeName()) then
     utils.printToSim("GROUP: " .. group:getName() .. " SKIPPED, NOT SUPPORTED TYPE")
+    GlobalLogger:create():error("GROUP: " .. group:getName() .. " SKIPPED, NOT SUPPORTED TYPE")
     return
   end
   
   local groupTbl = mist.getGroupTable(group:getName())
+  if not groupTbl then 
+    utils.printToSim("GROUP: " .. group:getName() .. " NOT FINDED BY MIST")
+    GlobalLogger:create():error("GROUP: " .. group:getName() .. " NOT FINDED BY MIST")
+    return
+  end
+
   if groupTbl.uncontrolled then 
     --group spawn with disabled ai
     local cont = AiDeferredContainer:create(group, groupTbl)
@@ -367,7 +374,7 @@ function GciCapHandler:setDiscardDamaged(val)
   self.discardDamagedGroups = val
 end
 
-function GciCapHandler:addSquadron(sqn) 
+function GciCapHandler:addSquadron(sqn, generateObj, objRadius) 
   if not self:checkObjectCoalition(sqn) then
     utils.printToSim(sqn:getName() .. " SQN WITH WRONG COALITION(try change original group side)")
     return
@@ -381,10 +388,12 @@ function GciCapHandler:addSquadron(sqn)
     objective:addSquadron(sqn)
   end
   
-  if sqn:objectiveActive() then
-    --also add squadron to covering area, but with small priority
-    self:addObjective(sqn:getObjective())
+  if not generateObj then
+    return
   end
+
+  --add objective 
+  self:addObjective(sqn:generateObjective(objRadius))
 end
 
 --if you make priority changes in objectives AFTER adding to class, call this

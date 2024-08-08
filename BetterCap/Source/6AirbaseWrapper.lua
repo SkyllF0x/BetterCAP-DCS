@@ -56,7 +56,7 @@ function AirbaseWrapper:create(id)
   local instance = nil
   
  --find airbase by id
-  for _, airbase in pairs(world.getAirbases()) do 
+  for _, airbase in pairs(world.getAirbases(nil)) do 
     if airbase:getID() == id then
       instance = self:super():create(airbase)
       break

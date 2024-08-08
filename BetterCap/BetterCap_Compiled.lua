@@ -1,11 +1,10 @@
----Better CAP version: 0.1.0 |build 2 | Build time: 27.05.2024 1506Z---
-env.info("Better CAP version: 0.1.0 |build 2 | Build time: 27.05.2024 1506Z")
+---Better CAP version: 0.1.2 | Build time: 08.08.2024 1558Z---
+env.info("Better CAP version: 0.1.2 | Build time: 08.08.2024 1558Z")
 ---------------------------------------------------------------------------
 ---------------------------------------------------------------------------
 --     Source file: 0Utility.lua
 ---------------------------------------------------------------------------
 ---------------------------------------------------------------------------
-
 
 utils = {}
 utils.generalID = 0 --used for internal purposes(i.e. zone ID or detector handler)
@@ -1505,7 +1504,7 @@ function AirbaseWrapper:create(id)
   local instance = nil
   
  --find airbase by id
-  for _, airbase in pairs(world.getAirbases()) do 
+  for _, airbase in pairs(world.getAirbases(nil)) do 
     if airbase:getID() == id then
       instance = self:super():create(airbase)
       break
@@ -6099,7 +6098,7 @@ function GroupRoute:create(groupR)
       --find airfield, check if it still avail
       local airfield = AirbaseWrapper:create(instance.waypoints[i].airdromeId) 
       
-      if airfield:isAvail() then 
+      if airfield and airfield:isAvail() then 
         instance.homeBase = mist.utils.deepCopy(instance.waypoints[i])
         instance.airbaseFinded = true
         break
@@ -6110,7 +6109,7 @@ function GroupRoute:create(groupR)
       --find carrier
       local carrier = CarrierWrapper:create(instance.waypoints[i].helipadId)
       
-      if carrier:isAvail() then 
+      if carrier and carrier:isAvail() then 
         instance.homeBase = mist.utils.deepCopy(instance.waypoints[i])
         instance.airbaseFinded = true
         break
@@ -6497,7 +6496,7 @@ function CapGroup:create(planes, originalName, route)
   instance.elements = {CapElement:create(planes)}
   instance.countPlanes = #planes
   
-  instance.name = originalName or "CapGroup-"..tostring(instance.id)
+  instance.name = originalName or ("CapGroup-"..tostring(instance.id))
   instance.id = utils.getGroupID()
   instance.typeName = planes[1]:getTypeName()
   
@@ -7427,7 +7426,7 @@ end
 function CapGroupRoute:getDebugStr(settings) 
   local message = CapGroup.getDebugStr(self, settings)
   
-  local idx = string.find(message, "\n")
+  local idx = string.find(message, "\n") or 0
   message = string.sub(message, 1, idx) .. utils.getMargin(4) .. "Objective: " .. self.objective:getName() .. string.sub(message, idx)
   
   return message
@@ -8806,9 +8805,9 @@ function CapObjective:create(point, gciZone, useForCap, useForGci, prior, custom
   local instance = {}
   setmetatable(instance, {__index = self, __eq = utils.compareTables})
   instance.id = utils.getGeneralID()
-  instance.name = customName or "CapObjective-" .. tostring(instance.id)
+  instance.name = customName or ("CapObjective-" .. tostring(instance.id))
   
-  instance.point = point
+  instance.point = mist.utils.makeVec3(point)
   instance.zone = gciZone
   instance.requestCap = useForCap or false
   instance.requestGci = useForGci or false
@@ -9015,6 +9014,8 @@ end
 ---------------------------------------------------------------------------
 ---------------------------------------------------------------------------
 
+
+---@meta "CapSquadronMeta"
 ----------------------------------------------------
 -- CapSquadron FSM, standart waiting, with aircraft
 ---prepared
@@ -9139,7 +9140,9 @@ function CapSquadronAir:create(prototypeGroupName, aircraftReady, aircraftAvail,
   instance.coalition = g:getCoalition()
   instance.country = g:getUnit(1):getCountry()
   
-  instance.prototypeTable = mist.getGroupTable(prototypeGroupName)
+  ---@type GroupTable
+  ---@diagnostic disable-next-line: assign-type-mismatch 
+  instance.prototypeTable = mist.getGroupTable(prototypeGroupName)--name check in caller, always return valid table
   instance.prototypeTable.task = "CAP"
   instance.prototypeTable.uncontrolled = nil
   instance.prototypeTable.lateActivation = nil
@@ -9189,17 +9192,15 @@ function CapSquadronAir:create(prototypeGroupName, aircraftReady, aircraftAvail,
   }
   instance.goLiveThreshold = 2
   
-  --objective used for cover this sqn spawn point
-  instance.objective = CapObjective:create(
-    instance.point, CircleZone:create(instance.point, 100000), true, true, CapObjective.Priority.Low, instance.name .. "-home")
-  instance.objective:addSquadron(instance)
-  instance.useObjective = true --should handler add objective from this sqn
-  
   return instance
 end
 
-function CapSquadronAir:setObjectiveUse(val)
-  self.useObjective = val
+--generate objective at sqn start point with CircleZone with radius R(default is 200km)
+--objective by default request only GCI
+function CapSquadronAir:generateObjective(R)
+    local radius = R or 200000
+    local pos = mist.utils.deepCopy(self:getPoint())--can corrupt point when creates
+    return CapObjective:create(pos, CircleZone:create(pos, radius), false, true, nil, self:getName() .. "-home")
 end
 
 function CapSquadronAir:setPriority(priority) 
@@ -9246,14 +9247,6 @@ end
 
 function CapSquadronAir:getPriorityModifier() 
   return self.priority
-end
-
-function CapSquadronAir:getObjective() 
-  return self.objective
-end
-
-function CapSquadronAir:objectiveActive() 
-  return self.useObjective
 end
 
 --valid wp to spawn point
@@ -9965,7 +9958,7 @@ function AbstractMainloop:addAwacs(awacsUnit)
     utils.printToSim(awacsUnit:getName() .. " AWACS WITH WRONG COALITION")
     return
    elseif not (awacsUnit:hasAttribute('AWACS')) then 
-    utils.printToSim(radar:getName() .. " IS NOT A AWACS")
+    utils.printToSim(awacsUnit:getName() .. " IS NOT A AWACS")
     return
   end
   
@@ -10139,10 +10132,17 @@ function AiHandler:addGroup(group)
 
   if not rawget(utils.PlanesTypes, group:getUnit(1):getTypeName()) then
     utils.printToSim("GROUP: " .. group:getName() .. " SKIPPED, NOT SUPPORTED TYPE")
+    GlobalLogger:create():error("GROUP: " .. group:getName() .. " SKIPPED, NOT SUPPORTED TYPE")
     return
   end
   
   local groupTbl = mist.getGroupTable(group:getName())
+  if not groupTbl then 
+    utils.printToSim("GROUP: " .. group:getName() .. " NOT FINDED BY MIST")
+    GlobalLogger:create():error("GROUP: " .. group:getName() .. " NOT FINDED BY MIST")
+    return
+  end
+
   if groupTbl.uncontrolled then 
     --group spawn with disabled ai
     local cont = AiDeferredContainer:create(group, groupTbl)
@@ -10278,7 +10278,7 @@ function GciCapHandler:setDiscardDamaged(val)
   self.discardDamagedGroups = val
 end
 
-function GciCapHandler:addSquadron(sqn) 
+function GciCapHandler:addSquadron(sqn, generateObj, objRadius) 
   if not self:checkObjectCoalition(sqn) then
     utils.printToSim(sqn:getName() .. " SQN WITH WRONG COALITION(try change original group side)")
     return
@@ -10292,10 +10292,12 @@ function GciCapHandler:addSquadron(sqn)
     objective:addSquadron(sqn)
   end
   
-  if sqn:objectiveActive() then
-    --also add squadron to covering area, but with small priority
-    self:addObjective(sqn:getObjective())
+  if not generateObj then
+    return
   end
+
+  --add objective 
+  self:addObjective(sqn:generateObjective(objRadius))
 end
 
 --if you make priority changes in objectives AFTER adding to class, call this

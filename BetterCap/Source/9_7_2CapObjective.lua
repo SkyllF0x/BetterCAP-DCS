@@ -26,9 +26,9 @@ function CapObjective:create(point, gciZone, useForCap, useForGci, prior, custom
   local instance = {}
   setmetatable(instance, {__index = self, __eq = utils.compareTables})
   instance.id = utils.getGeneralID()
-  instance.name = customName or "CapObjective-" .. tostring(instance.id)
+  instance.name = customName or ("CapObjective-" .. tostring(instance.id))
   
-  instance.point = point
+  instance.point = mist.utils.makeVec3(point)
   instance.zone = gciZone
   instance.requestCap = useForCap or false
   instance.requestGci = useForGci or false
