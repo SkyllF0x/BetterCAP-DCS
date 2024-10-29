@@ -291,39 +291,43 @@ function GlobalLogger:printToSim(levelStr, message, level)
 end
 
 function GlobalLogger:debug(message) 
+  self:printToSim("DEBUG: ", message, GlobalLogger.LEVELS.DEBUG)
+
   if self.settings.level > GlobalLogger.LEVELS.DEBUG then 
     return
   end
   
   self:printToLog("DEBUG: ", message)
-  self:printToSim("DEBUG: ", message, GlobalLogger.LEVELS.DEBUG)
 end
 
 function GlobalLogger:info(message) 
+  self:printToSim("INFO: ", message, GlobalLogger.LEVELS.INFO)
+
   if self.settings.level > GlobalLogger.LEVELS.INFO then 
     return
   end
   
   self:printToLog("INFO: ", message)
-  self:printToSim("INFO: ", message, GlobalLogger.LEVELS.INFO)
 end
 
 function GlobalLogger:warning(message) 
+  self:printToSim("WARNING: ", message, GlobalLogger.LEVELS.WARNING)
+
   if self.settings.level > GlobalLogger.LEVELS.WARNING then 
     return
   end
   
   self:printToLog("WARNING: ", message)
-  self:printToSim("WARNING: ", message, GlobalLogger.LEVELS.WARNING)
 end
 
 function GlobalLogger:error(message) 
+  self:printToSim("WARNING: ", message, GlobalLogger.LEVELS.WARNING)
+
   if self.settings.level > GlobalLogger.LEVELS.ERROR then 
     return
   end
   
   self:printToLog("ERROR: ", message)
-  self:printToSim("ERROR: ", message, GlobalLogger.LEVELS.ERROR)
 end
 
 function GlobalLogger:drawPoint(data)

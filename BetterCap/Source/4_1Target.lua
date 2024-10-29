@@ -2,12 +2,19 @@
 -- Container for detected object, wrapper around default detection table
 -- https://wiki.hoggitworld.com/view/DCS_func_getDetectedTargets
 ----------------------------------------------------    
-
+---@class TargetContainer
+---@field private dcsObject table
+---@field private detector AbstractDCSObject
+---@field private typeKnown boolean
+---@field private rangeKnown boolean
 TargetContainer = {}
 
+---@param dcsDetectionTable DCSDetectionTable
+---@param detectorObject AbstractDCSObject
+---@return TargetContainer
 function TargetContainer:create(dcsDetectionTable, detectorObject)   
   local instance = {}
-    
+
   instance.dcsObject = dcsDetectionTable.object
   instance.detector = detectorObject
   instance.typeKnown = dcsDetectionTable.type
@@ -18,18 +25,22 @@ function TargetContainer:create(dcsDetectionTable, detectorObject)
   return setmetatable(instance, {__index = self})
 end
 
+---@return table
 function TargetContainer:getTarget() 
   return self.dcsObject
 end
 
+---@return AbstractDCSObject
 function TargetContainer:getDetector()
   return self.detector
 end
 
+---@return boolean
 function TargetContainer:isTypeKnown() 
   return self.typeKnown
 end
 
+---@return boolean
 function TargetContainer:isRangeKnown() 
   return self.rangeKnown
   end
@@ -40,14 +51,22 @@ function TargetContainer:isRangeKnown()
 ----------------------------------------------------    
 -- AbstractTarget object
 ----------------------------------------------------    
+---@class AbstractTarget
+---@field protected currentROE AbstractTarget.ROE
+---@field protected typeModifier AbstractTarget.TypeModifier
+---@field protected targeted boolean
 AbstractTarget = {}
-AbstractTarget.ROE = {}
-AbstractTarget.ROE.Bandit = 1  --target outside border, will not be attacket until shot to friendlies
-AbstractTarget.ROE.Hostile = 2 --valid target
-AbstractTarget.TypeModifier = {}
-AbstractTarget.TypeModifier.FIGHTER = 1
-AbstractTarget.TypeModifier.ATTACKER = 2
-AbstractTarget.TypeModifier.HELI = 3
+---@enum AbstractTarget.ROE
+AbstractTarget.ROE = {
+  Bandit = 1,  --target outside border, will not be attacket until shot to friendlies
+  Hostile = 2 --valid target
+}
+---@enum AbstractTarget.TypeModifier
+AbstractTarget.TypeModifier = {
+  FIGHTER = 1,
+  ATTACKER = 2,
+  HELI = 3
+}
 
 AbstractTarget.names = {}
 AbstractTarget.names.ROE = {
@@ -60,19 +79,18 @@ AbstractTarget.names.typeModifier = {
   [AbstractTarget.TypeModifier.HELI] = "HELI"
 }
 
-
+---update ROE for target
+---@param roeEnum AbstractTarget.ROE
 function AbstractTarget:setROE(roeEnum) 
   self.currentROE = roeEnum
 end
 
+---@return AbstractTarget.ROE
 function AbstractTarget:getROE() 
   return self.currentROE 
 end
 
-function AbstractTarget:setTargeted(value) 
-  self.targeted = value
-end
-
+---@return boolean
 function AbstractTarget:getTargeted() 
   return self.targeted
 end
@@ -83,6 +101,7 @@ function AbstractTarget:setTargeted(newVal)
 end
 
 --type of target( FIGHTER or ATTACKER )used for priority calc
+---@return AbstractTarget.TypeModifier
 function AbstractTarget:getTypeModifier() 
   return self.typeModifier
 end
@@ -102,11 +121,24 @@ end
 ----                  ↓                  ↓
 ----               Target  <-------------    
 ----------------------------------------------------  
+---@class Target: AbstractTarget, ObjectWithEvent
+---@field private holdTime number how long keep extrapolate contact until drop
+---@field private point Vec3 calculated point
+---@field private position Position calculated data for getPosition()
+---@field private velocity Vec3 calculated velocity
+---@field private deltaVelocity Vec3 
+---@field private lastSeen {['L1']: number, ["L2"]: number, ["L3"]: number} 
+---@field private seenBy TargetContainer[] all containers contains this target in current detection frame
+---@field private controllType Target.ControlType
+---@field private shooter boolean
 Target = utils.inheritFromMany(AbstractTarget, ObjectWithEvent)
-Target.ControlType = {}
-Target.ControlType.LEVEL1 = 1
-Target.ControlType.LEVEL2 = 2
-Target.ControlType.LEVEL3 = 3
+
+---@enum Target.ControlType
+Target.ControlType = {
+LEVEL1 = 1,
+LEVEL2 = 2,
+LEVEL3 = 3
+}
 
 --for message forming
 Target.names = {}
@@ -116,9 +148,13 @@ Target.names.ControlType = {
   [Target.ControlType.LEVEL3] = "L3"
   }
 
+  ---@param targetContainer TargetContainer
+  ---@param extrapolateTime number
+  ---@return Target
 function Target:create(targetContainer, extrapolateTime) 
   local instance = ObjectWithEvent:create(targetContainer:getTarget())--call explicitly
   setmetatable(instance, {__index = self, __eq = utils.compareTables})
+  ---@cast instance Target
   
   local zeroVec = {x = 0, y = 0, z = 0}
   
@@ -133,7 +169,7 @@ function Target:create(targetContainer, extrapolateTime)
   
   instance.currentROE = AbstractTarget.ROE.Bandit
   instance.targeted = false
-  instance.shooter = false --flag shows this target shoot at us
+  instance.shooter = false --flag shows this target shoot at object belonging to our coalition
   instance.typeName = "Unknown" --leave unknown so it will be populate by updateTypes() in first run if type known
   instance.typeKnown = false --leave false so it will be populate by updateTypes() in first run if type known
   instance.typeModifier = AbstractTarget.TypeModifier.ATTACKER
@@ -148,6 +184,7 @@ function Target:create(targetContainer, extrapolateTime)
   return instance
 end
 
+---@return string
 function Target:getDebugStr() 
   return self:getName() .. " targeted: " .. tostring(self.targeted) .. " | ROE: " .. AbstractTarget.names.ROE[self.currentROE] .. " | Type: " .. self:getTypeName() 
     .. " | TypeMod: " .. AbstractTarget.names.typeModifier[self.typeModifier] .. " | Control: " .. Target.names.ControlType[self.controlType] .. "\n" 
@@ -157,10 +194,11 @@ function Target:engineOffEvent(event)
   --not interested in this
 end
 
+---@param event ShotEvent
 function Target:shotEvent(event) 
   local t = event.weapon:getTarget()
     
-    if t and event.initiator == self.dcsObject then 
+    if t and event.initiator == self.dcsObject and event.weapon:getDesc().category == Weapon.Category.MISSILE then 
       local coal = t:getCoalition()
       if coal ~= self.dcsObject:getCoalition() and coal ~= 0 then --if it no friendly fire or attack neutral so it attack us(thankfull dcs not model multunational war)
         self.shooter = true
@@ -168,6 +206,7 @@ function Target:shotEvent(event)
     end
   end
   
+---@return boolean
 function Target:isExist() 
   --we can magically know target alive or not
   if self.dcsObject and self.dcsObject:isExist() and not self:isOutages() then 
@@ -178,28 +217,35 @@ function Target:isExist()
   return false
 end
 
+---@return boolean
 function Target:isShooter() 
   return self.shooter
   end
 
+  ---@return Vec3
 function Target:getPoint() 
   return self.point
 end
 
+---@return Position
 function Target:getPosition() 
   return self.position
 end
 
+---@return Vec3
 function Target:getVelocity() 
   return self.velocity
 end
 
+---@return number
 function Target:getSpeed() 
   --small helper
   return mist.vec.mag(self.velocity)
 end
 
 --return AOB for point
+---@param point Vec3
+---@return number
 function Target:getAA(point) 
   local targetVel = self.velocity
   
@@ -215,6 +261,7 @@ function Target:getAA(point)
   end
 
 --this object was detected
+---@param targetContainer TargetContainer
 function Target:hasSeen(targetContainer)
   self.seenBy[#self.seenBy+1] = targetContainer
 end
@@ -319,6 +366,7 @@ function Target:updateType()
   end
 end
 
+---@return boolean
 function Target:isOutages() 
   return timer.getAbsTime() - self.lastSeen.L2 >= self.holdTime and timer.getAbsTime() - self.lastSeen.L1 >= self.holdTime
   end
@@ -347,4 +395,3 @@ function Target:update()
   self:updateLEVEL2()
   return
 end
-

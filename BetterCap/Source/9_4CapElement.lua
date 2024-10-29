@@ -120,6 +120,7 @@ function CapElement:registerGroup(capGroup)
   self.myGroup = capGroup
   end
 
+
 --return true if any of aircraft has RWR indication of any of contacts
 --in listContacts
 function CapElement:isSpikedBy(listContacts) 
@@ -159,7 +160,6 @@ function CapElement:sortByAmmo()
 end
 
 
-
 function CapElement:setSecondElement(element) 
   self.secondElement = element
   end
@@ -180,5 +180,3 @@ function CapElement:callFSM()
   self:callPlanes()
   self.FSM_args = {}
 end
-
-

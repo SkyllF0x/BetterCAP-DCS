@@ -22,6 +22,7 @@ end
 
 
 do 
+  ---@class Controller
   Controller = {}
   Controller.Detection = {  
   VISUAL = 1,

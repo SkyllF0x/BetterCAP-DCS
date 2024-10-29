@@ -93,6 +93,7 @@ end
 ----            CapSquadronAir
 ----------------------------------------------------
 
+---@class CapSquadronAir: AbstractCAP_Handler_Object
 CapSquadronAir = utils.inheritFrom(AbstractCAP_Handler_Object)
 CapSquadronAir.FSM_Enum = {
   CapSquadronReady = 101,
@@ -105,6 +106,7 @@ CapSquadronAir.Priority.LOW = 1.25
 CapSquadronAir.Priority.NORMAL = 1
 CapSquadronAir.Priority.HIGH = 0.75
 
+---@return CapSquadronAir
 function CapSquadronAir:create(prototypeGroupName, aircraftReady, aircraftAvail, preflightTime, combatRadius, priority) 
   
   local instance = {}
@@ -117,7 +119,7 @@ function CapSquadronAir:create(prototypeGroupName, aircraftReady, aircraftAvail,
   local g = Group.getByName(prototypeGroupName)
   
   if not rawget(utils.PlanesTypes, g:getUnit(1):getTypeName()) then 
-    utils.printToSim("Group: " .. prototypeGroupName .. " -> THIS AIRCRAFT TYPE NO SUPPORTED, SKIPPED")
+    utils.printToSim("Group: " .. prototypeGroupName .. " -> THIS AIRCRAFT TYPE NO SUPPORTED, SKIPPED, TYPE: " .. g:getUnit(1):getTypeName())
     return 
   end
   
@@ -518,6 +520,7 @@ function CapSquadronCold:getDebugStr()
 CapSquadron = {}
 CapSquadron.Priority = CapSquadronAir.Priority
 
+---@return CapSquadronAir
 function CapSquadron:create(groupName, aircraftReady, aircraftTotal, preflightTime, combatRange, priority) 
   local firstPoint = mist.getGroupRoute(groupName)[1]
   

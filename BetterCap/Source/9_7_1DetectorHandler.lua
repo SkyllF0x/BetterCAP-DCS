@@ -218,12 +218,14 @@ function DetectionHandler:updateRadars()
   
   for _, groundRadar in pairs(self.radars) do 
     if not groundRadar:isExist() then 
+      GlobalLogger:create():debug("Ground radar: " .. groundRadar:getName() .. " dead")
       self.radars[groundRadar:getID()] = nil
     end
   end
     
   for _, airGroup in pairs(self.airborneRadars) do 
     if not airGroup:isExist() or not airGroup:getAutonomous() then
+      GlobalLogger:create():debug("Airborne radar: " .. airGroup:getName() .. " dead")
       self.airborneRadars[airGroup:getID()] = nil
     end
   end

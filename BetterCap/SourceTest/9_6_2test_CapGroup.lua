@@ -1508,13 +1508,13 @@ function test_CapGroupRoute:test_creation_useParamsFromSqn_2WP()
   --case21: objective far enough, fly directly to zone
   local testedInst = CapGroupRoute:create({plane1}, obj, sqn)
   local route = testedInst.route
-  lu.assertEquals(route.waypoints[1].speed, sqn.speed)
-  lu.assertEquals(route.waypoints[1].alt, sqn.alt)
-  lu.assertEquals(route.waypoints[1].alt_type, sqn.alt_type)
-  lu.assertEquals(#route.waypoints, 2)
+  lu.assertEquals(route.waypoints[2].speed, sqn.speed)
+  lu.assertEquals(route.waypoints[2].alt, sqn.alt)
+  lu.assertEquals(route.waypoints[2].alt_type, sqn.alt_type)
+  lu.assertEquals(#route.waypoints, 3)
   
   --zone also uses alt/speed
-  local _, zone = next(testedInst.patrolZones[1])
+  local _, zone = next(testedInst.patrolZones[2])
   lu.assertEquals(zone.task.params.altitude, sqn.alt)
   lu.assertEquals(zone.task.params.speed, sqn.speed)
 end
@@ -1658,7 +1658,7 @@ function test_CapGroupRoute:test_setNewObjective_FlyRoute()
   testedInst:setFSM_NoCall(FSM_FlyRoute:create(testedInst))
   
   --verify original task set
-  lu.assertEquals(plane1.FSM_stack:getCurrentState().task.params.route.points[1], testedInst.route.waypoints[1])
+  lu.assertEquals(plane1.FSM_stack:getCurrentState().task.params.route.points[1], testedInst.route.waypoints[2])
   lu.assertEquals(plane1.FSM_stack:getCurrentState().task.params.route.points[1].x, obj:getPoint().x + 20000) --north point of hold
   lu.assertEquals(plane1.FSM_stack:getCurrentState().task.params.route.points[1].y, obj:getPoint().z)
   
@@ -1830,6 +1830,66 @@ function test_CapGroupRoute:test_patrolZoneOverField_ChangeToOtherZone()
   lu.assertEquals(plane1.FSM_stack:getCurrentState().task.params.point, {x = 20500, y = 0})
 end  
 
+--Cases when group cover far objective, so route is only 2 points, should return to home base
+function test_CapGroupRoute:test_patrolZoneNormal() 
+  local sqn = getCapSquadronMock()
+  local obj = getCapObjectiveMock()
+  obj.getPoint = function() return {x = 500000, y = 0, z = 0} end --or will immidiatly trigger rtb
+
+  local plane1 = getCapPlane()
+  local testedInst = CapGroupRoute:create({plane1}, obj, sqn)
+  testedInst.needRTB = function() return false end
+  --group cover same airfield which he takeoff
+  testedInst.getPoint = function ()
+    return {x=0, y = 0, z = 0} 
+  end
+  
+  testedInst:update()
+  testedInst:setFSM_Arg("contacts", {})
+  testedInst:setFSM_Arg("radars", {})
+  testedInst:callFSM({})
+  lu.assertEquals(testedInst:getCurrentFSM(), CapGroup.FSM_Enum.FSM_GroupStart)
+  
+  --group take off, and now climbing toward climb wp
+  testedInst.isAirborne = function() return true end
+  testedInst:update()
+  testedInst:setFSM_Arg("contacts", {})
+  testedInst:setFSM_Arg("radars", {})
+  testedInst:callFSM({})
+  lu.assertEquals(testedInst:getCurrentFSM(), CapGroup.FSM_Enum.FSM_FlyRoute)
+  
+  
+  --group approach to patrol zone, go patrolling
+  --group reach zone wp and in range to switch, enter hold
+  testedInst.getPoint = function ()
+    return mist.vec.add(obj:getPoint(), {x = 20000, y = 0, z = 0})
+  end
+  
+  testedInst:update()
+  testedInst:setFSM_Arg("contacts", {})
+  testedInst:setFSM_Arg("radars", {})
+  testedInst:callFSM({})--will update route
+  lu.assertEquals(testedInst:getCurrentFSM(), CapGroup.FSM_Enum.FSM_PatrolZone)
+  
+  --group need RTB
+  testedInst.needRTB = function() return true end
+  testedInst:update()
+  testedInst:setFSM_Arg("contacts", {})
+  testedInst:setFSM_Arg("radars", {})
+  testedInst:callFSM({})
+  lu.assertEquals(testedInst:getCurrentFSM(), CapGroup.FSM_Enum.FSM_GroupRTB)
+  --verify fly toward home
+  lu.assertEquals(testedInst.route:getHomeBase(), sqn:getHomeWP())
+  lu.assertEquals(plane1.FSM_stack:getCurrentState().task.params.route.points[1].x, sqn:getHomeWP().x)
+  lu.assertEquals(plane1.FSM_stack:getCurrentState().task.params.route.points[1].y, sqn:getHomeWP().y)
+
+  --reach home proximity, deactivate
+  testedInst.getPoint = function() return sqn:getPoint() end
+  testedInst:setFSM_Arg("contacts", {})
+  testedInst:setFSM_Arg("radars", {})
+  testedInst:callFSM({})
+  lu.assertEquals(testedInst:getCurrentFSM(), CapGroup.FSM_Enum.FSM_Deactivate)
+end
 
 function test_CapGroupRoute:test_updateRemovePlanes() 
   local sqn = getCapSquadronMock()
@@ -1872,6 +1932,7 @@ function test_CapGroupRoute:test_updateRemovePlanes()
   testedInst:update()
   verify(obj:addCapPlanes(-1))
 end
+
 
 local runner = lu.LuaUnit.new()
 --runner:setOutputType("tap")

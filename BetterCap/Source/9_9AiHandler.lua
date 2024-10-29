@@ -182,7 +182,7 @@ function AbstractMainloop:spawnGroup(container)
       self.groups[group:getID()] = group
       self.groupErrors[group:getID()] = 0
       
-      GlobalLogger:create():info(container:getName() .. " is activated")
+      GlobalLogger:create():info(group:getName() .. " activated with: " .. tostring(group:getOriginalSize()) .. " planes")
     end, debug.traceback)
 
   if not result then 
@@ -227,8 +227,9 @@ AiHandler.coalition = AbstractMainloop.coalition
 function AiHandler:addGroup(group) 
 
   if not rawget(utils.PlanesTypes, group:getUnit(1):getTypeName()) then
-    utils.printToSim("GROUP: " .. group:getName() .. " SKIPPED, NOT SUPPORTED TYPE")
-    GlobalLogger:create():error("GROUP: " .. group:getName() .. " SKIPPED, NOT SUPPORTED TYPE")
+    local msg = "GROUP: " .. group:getName() .. " SKIPPED, NOT SUPPORTED TYPE: " .. group:getUnit(1):getTypeName()
+    utils.printToSim(msg)
+    GlobalLogger:create():error(msg)
     return
   end
   
@@ -498,7 +499,7 @@ function GciCapHandler:spawnGroup(container)
       self.groups[group:getID()] = group
       self.groupErrors[group:getID()] = 0
       
-      GlobalLogger:create():info(container:getName() .. " is activated")
+      GlobalLogger:create():info(group:getName() .. " is activated with " .. tostring(group:getOriginalSize() .. " planes"))
     end, debug.traceback)
 
   if not result then 
@@ -660,7 +661,6 @@ function GciCapHandler:checkCap()
     
     --no check for airborneGroupLimit because createNewGroupsFromSqn() won't spawn group if counter full
     if capNeeded >= minSize then 
-      
       --don't need planes now, request non ready group
       self:spawnAircraftsForObjective(objective, capNeeded, false) 
     end

@@ -1,7 +1,9 @@
 -------------------------------------------------------------------
 ---- EventHander signleton which track all related to script objects
 -------------------------------------------------------------------
-
+---@class EventHandler
+---@field private _inst EventHandler?
+---@field private objects ObjectWithEvent[]
 EventHandler = {
   _inst = nil
   }
@@ -17,6 +19,8 @@ function EventHandler:create()
     return self._inst
   end
 
+  ---@param event Event
+  ---@return nil
   function EventHandler:onEvent(event) 
     local result, err = xpcall(function() 
         
@@ -38,14 +42,18 @@ function EventHandler:create()
     end
   end
   
+  ---@param object ObjectWithEvent
   function EventHandler:registerObject(object)  
    self.objects[object:getID()] = object
   end
   
+  ---@param object ObjectWithEvent
   function EventHandler:removeObject(object) 
     self.objects[object:getID()] = nil
   end
   
+  ---Shutdown event handler and delete sigleton, after this call it unusable
+  ---subsequent call to create() will instantiate new intance
   function EventHandler:shutdown() 
     world.removeEventHandler(self)
     EventHandler._inst = nil

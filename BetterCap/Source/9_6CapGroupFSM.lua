@@ -36,6 +36,7 @@ function FSM_GroupStart:run(arg)
     return
   end
   
+  GlobalLogger:create():debug(self.object:getName() .. " airborne, push to FlyRoute")
   self.object:setFSM(FSM_FlyRoute:create(self.object))
 end
 
@@ -70,6 +71,8 @@ function FSM_GroupChecks:checkAttack(contacts)
   end
   
   if tgt.range > tgt.commitRange then 
+    GlobalLogger:create():debug(self.object:getName() .. " go commit on: " .. tgt.target:getName() .. " range: " 
+      .. tostring(tgt.range) .. " CR: " .. tostring(tgt.commitRange))
     self.object:setFSM(FSM_Commit:create(self.object, tgt.target))
     return true
   end
@@ -166,6 +169,8 @@ function FSM_Rejoin:create(handledGroup)
 end
 
 function FSM_Rejoin:setup() 
+  GlobalLogger:create():info(self.object:getName() .. " FSM_Rejoin:setup(), range to lead " .. tostring(self.object:getMaxDistanceToLead()))
+
   self.object:mergeElements()
   self.object.elements[1]:clearFSM()
   
@@ -186,6 +191,7 @@ function FSM_Rejoin:run(arg)
     return
   end
 
+  GlobalLogger:create():info(self.object:getName() .. " rejoin complete")
   --we close enough, return to prev state
   self.object:popFSM()
 end
@@ -216,22 +222,32 @@ function FSM_GroupRTB:create(handledGroup)
   return setmetatable(instance, {__index = self, __eq = utils.compareTables})
   end
 
-
 function FSM_GroupRTB:setup() 
   self.object:setAutonomous(false)
   self.object:mergeElements()
   self.object.elements[1]:clearFSM()
   
   --prohibit AB using
+  --allow infinite fuel, or can crash
   for _, plane in self.object:planes() do 
     plane:setOption(CapPlane.options.BurnerUse, utils.tasks.command.Burner_Use.Off)
+    plane:getController():setCommand({ 
+      id = 'SetUnlimitedFuel', 
+      params = { 
+        value = true 
+      } 
+    })
     end
   
   --if homeBase if airfield, fly as singletons, set FSM_PlaneRTB, if it just a point set FlyToPoint
   if self.object.route:hasAirfield() then 
+    GlobalLogger:create():info(self.object:getName() .. " FSM_GroupRTB:setup(), RTB to airfield")
+
     self.object.elements[1]:setFSM(FSM_Element_FlySeparatly:create(self.object.elements[1], FSM_PlaneRTB, self.waypoint))
   else
-    --create waypoint at wp postion at altitude of 5000m, use standart fly in formation
+    GlobalLogger:create():info(self.object:getName() .. " FSM_GroupRTB:setup(), RTB to WP")
+
+    --create waypoint at wp position at altitude of 5000m, use standart fly in formation
     self.object.elements[1]:setFSM(FSM_Element_FlyFormation:create(self.object.elements[1], FSM_FlyToPoint, 
         mist.fixedWing.buildWP(self.waypoint, "turningpoint", 250, 5000, "BARO")))
   end
@@ -345,6 +361,8 @@ function FSM_FlyRoute:setup()
         self.object.elements[1], FSM_FlyToPoint, mist.fixedWing.buildWP(self.object.route:getHomeBase(), "turningpoint", 200, 8000, "BARO")))
     
     self:setTargetSpeed(200)
+    
+    GlobalLogger:create():info(self.object:getName() .. " FSM_FlyRoute:setup(), fly toward home")
     return
   end
   
@@ -353,7 +371,6 @@ function FSM_FlyRoute:setup()
   --update target speed
   self:setTargetSpeed(self.object.route:getCurrentWaypoint().speed)
 end
-
 
 
  --check approach for any of patrols zones for current WP, and if so 
@@ -428,6 +445,8 @@ function FSM_Deactivate:run(arg)
   
   --wipe elements
   self.object.elements = {}
+
+  GlobalLogger:create():info(self.object:getName() .. " FSM_Deactivate:run() deactivate group")
   end
 
 ----------------------------------------------------
@@ -445,6 +464,7 @@ FSM_Deactivate_Route = utils.inheritFrom(FSM_Deactivate)
 
 function FSM_Deactivate_Route:setup() 
   --return remaining aircraft to squadron
+  GlobalLogger:create():info(self.object:getName() .. " FSM_Deactivate_Route:setup(), return planes: " .. tostring(self.object.countPlanes))
   self.object.sqn:returnAircrafts(self.object.countPlanes)
 end
 
@@ -479,6 +499,8 @@ end
 function FSM_Commit:setup() 
 
   if not (self.object.target and self.object.target:isExist()) then 
+    GlobalLogger:create():info(self.object:getName() .. " FSM_Commit:setup() no target")
+
     --no target, continue unwind
     self.object:popFSM()
     return
@@ -595,6 +617,7 @@ function FSM_Engaged:selectTactic()
   for enum, weight in pairs(tblWithWeights) do 
     local newRange = prevRange + stepSize*weight
     if prevRange <= randomChoice and randomChoice <= newRange then 
+
       return self.tactics[enum]
     end
     prevRange = newRange
@@ -607,6 +630,7 @@ function FSM_Engaged:setup()
   self.object:setAutonomous(true)
   
   self.tactic = self:selectTactic()
+
   for _, elem in pairs(self.object.elements) do 
     elem:clearFSM()
     elem:setFSM(self.tactic:create(elem))
@@ -634,12 +658,12 @@ function FSM_Engaged:run(arg)
   if self.object.ammoState <= self.object.rtbWhen or self.object:getFuel() < (self.object.bingoFuel + 0.1) then 
     self.object:popFSM_NoCall()
     self.object:setFSM(FSM_Pump:create(self.object))
-    GlobalLogger:create():info(self.object:getName() .. " exit, need RTB")
+    GlobalLogger:create():info(self.object:getName() .. " FSM_Engaged: exit, need RTB")
     return
     
   elseif not self.object.target:isExist() then
     --target dead, return
-    GlobalLogger:create():info(self.object:getName() .. " exit, target dead")
+    GlobalLogger:create():info(self.object:getName() .. " FSM_Engaged: exit, target dead")
     self.object:popFSM()
     return
   end
@@ -649,7 +673,7 @@ function FSM_Engaged:run(arg)
   local tgt = self.object:checkTargets(arg.contacts)
   if not tgt.target then 
     --no target for commit
-    GlobalLogger:create():info(self.object:getName() .. " exit, no more targets")
+    GlobalLogger:create():info(self.object:getName() .. " FSM_Engaged: exit, no more targets")
     self.object:popFSM()
     return
   
@@ -659,7 +683,7 @@ function FSM_Engaged:run(arg)
     local commitRange = tgt.commitRange
     if commitRange + 18500 < tgt.range then
       
-      GlobalLogger:create():info(self.object:getName() .. " drop target, range: " .. tostring(tgt.range) .. " cr: " .. tostring(commitRange))
+      GlobalLogger:create():info(self.object:getName() .. " FSM_Engaged: drop target, range: " .. tostring(tgt.range) .. " cr: " .. tostring(commitRange))
       self.object:popFSM()
       return
     end
@@ -672,7 +696,7 @@ function FSM_Engaged:run(arg)
     
     if tgt.priority/ourTargetPriority >= 1.1 then
 
-      GlobalLogger:create():debug(self.object:getName() .. " set new target for group: " .. tgt.target:getName())
+      GlobalLogger:create():debug(self.object:getName() .. " FSM_Engaged: set new target for group: " .. tgt.target:getName())
       --update target
       self.object.target:setTargeted(false)
       tgt.target:setTargeted(true)
@@ -699,7 +723,7 @@ function FSM_Engaged:checkForSplit(targets)
   if not (closestTarget.target and closestTarget.target ~= self.object.target) then 
     return
   end
-  GlobalLogger:create():debug(self.object:getName() .. " SPLIT")
+  GlobalLogger:create():info(self.object:getName() .. " FSM_Engaged: Split elements")
 
   --split group, first element continue attack original target
   --no range check, should pop manually
@@ -746,7 +770,7 @@ function FSM_Engaged:checkForRejoin(targets)
     return
   end
   
-  GlobalLogger:create():debug(self.object:getName() .. " return from SPLIT")
+  GlobalLogger:create():info(self.object:getName() .. " FSM_Engaged: rejoin elements")
   self.object.elements[1]:popFSM_NoCall()
 end
 
@@ -779,11 +803,20 @@ function FSM_Pump:setup()
   --allow usage of afterburner
   for _, plane in self.object:planes() do 
     plane:setOption(CapPlane.options.BurnerUse, utils.tasks.command.Burner_Use.On)
+    --set infinite fuel
+    plane:getController():setCommand({ 
+      id = 'SetUnlimitedFuel', 
+      params = { 
+        value = true 
+      } 
+    })
   end
   
   --convert to vec2 or it will use speed/alt from point
   local wp = mist.fixedWing.buildWP(mist.utils.makeVec2(self.object.route:getHomeBase()), "turningpoint", 500, 7000, "BARO")
   self.object.elements[1]:setFSM(FSM_Element_FlySeparatly:create(self.object.elements[1], FSM_FlyToPoint, wp))
+
+  GlobalLogger:create():info(self.object:getName() .. " FSM_Pump:setup() done")
 end
   
 function FSM_Pump:teardown() 
@@ -842,6 +875,8 @@ function FSM_PatrolZone:create(handledGroup, zone)
 end
 
 function FSM_PatrolZone:setup() 
+  GlobalLogger:create():info(self.object:getName() .. " FSM_PatrolZone:setup()")
+
   self.object:mergeElements()
   self.object.elements[1]:clearFSM()
   
@@ -867,5 +902,3 @@ function FSM_PatrolZone:run(arg)
     return
   end
 end
-
-

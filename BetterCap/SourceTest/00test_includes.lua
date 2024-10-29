@@ -6,7 +6,7 @@ land = require "DCS_Stubs\\Source\\Singletons\\land_stub"
 coalition = require "DCS_Stubs\\Source\\Singletons\\coalition_enums"
 dofile(".\\DCS_Stubs\\Source\\Classes\\DCS_Object.lua")
 
-dofile(".\\3rdParty\\mist_4_5_107.lua")
+dofile(".\\3rdParty\\mist_4_5_126.lua")
 lu = require "3rdParty\\luaunit_3_4\\luaunit"
 mockagne = require "3rdParty\\mockagne"
 

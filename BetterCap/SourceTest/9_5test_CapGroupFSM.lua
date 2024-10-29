@@ -434,6 +434,7 @@ function test_FSM_GroupRTB:test_setup_hasAirfield()
   --route:getHomeBase()
   --group:mergeElements() called
   --verify burner usage prohibited
+  --verify set inf fuel
   local plane1 = getCapPlane()
   local plane2 = getCapPlane()
   
@@ -449,6 +450,11 @@ function test_FSM_GroupRTB:test_setup_hasAirfield()
   
   plane1.setOption = m.setOption
   plane2.setOption = m.setOption
+
+  plane1.getController = function ()
+    return m
+  end
+  plane2.getController = plane1.getController
   
   local fsm = FSM_GroupRTB:create(group)
   fsm:setup()
@@ -459,6 +465,14 @@ function test_FSM_GroupRTB:test_setup_hasAirfield()
   --verify burner usage option
   verify(plane1:setOption(CapPlane.options.BurnerUse, utils.tasks.command.Burner_Use.Off))
   verify(plane2:setOption(CapPlane.options.BurnerUse, utils.tasks.command.Burner_Use.Off))
+
+  --verify inf fuel
+  verify(m:setCommand({ 
+    id = 'SetUnlimitedFuel', 
+    params = { 
+      value = true 
+    } 
+  }))
   
   --top of the stack is first element, so it was cleared
   lu.assertEquals(group.elements[1].FSM_stack.topItem, 1)
@@ -714,7 +728,6 @@ function test_FSM_FlyRoute:test_setup_notFlyingHome()
   lu.assertEquals(taskAlias.params.route.points[1], group.route:getCurrentWaypoint())
   end
 
-
 function test_FSM_FlyRoute:test_checkPatrolZone_noZones() 
   --no zones present, return false
   local group = getCapGroup()
@@ -767,9 +780,6 @@ function test_FSM_FlyRoute:test_checkPatrolZone_switch()
   lu.assertEquals(group:getCurrentFSM(), CapGroup.FSM_Enum.FSM_PatrolZone)
   verify_no_call(zone1:getPoint())
 end
-
-
-
 
 function test_FSM_FlyRoute:test_run_groupCheckReturns() 
   --groupChecks() return true, verfify early return
@@ -905,8 +915,6 @@ function test_FSM_FlyRoute:test_run_NoNextWp()
   fsm:run()
   verify_no_call(fsm:setNextWP())
   end
-
-
 
 function test_FSM_FlyRoute:test_setNextWP_flyRoute() 
   --route.isReachEnd return false
@@ -1277,6 +1285,7 @@ function test_FSM_Pump:test_setup()
   --verify FSM was cleaned
   --verify option set
   --verify task set(same point as homeBase, but at 12000 and speed 660)
+  --verify infinite fuel set
   local group = getCapGroup()
   local m = mockagne.getMock()
   local fsm = FSM_Pump:create(group)
@@ -1285,10 +1294,21 @@ function test_FSM_Pump:test_setup()
   group.route.getHomeBase = m.getHomeBase
   when(group.route:getHomeBase()).thenAnswer({x = 99, y = 99})
   
+  group.elements[1].planes[1].getController = function ()
+    return m
+  end
+
   fsm:setup()
   
   verify(m.mergeElements(group))
   verify(group.route:getHomeBase())
+  --verify inf fuel
+  verify(m:setCommand({ 
+      id = 'SetUnlimitedFuel', 
+      params = { 
+        value = true 
+      } 
+    }))
   
   --check elements was set
   local element = group.elements[1]

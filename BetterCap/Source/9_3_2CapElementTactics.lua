@@ -355,6 +355,7 @@ function FSM_Element_Skate:create(handledElem)
   else
     instance.ALR_check = self.checkAttackHigh
   end
+
   return setmetatable(instance, {__index = self, __eq = utils.compareTables})
 end
 
@@ -587,7 +588,6 @@ function FSM_Element_SkateOffset:create(handledElem)
   
   --use setup from skateOffset
   instance.setup = self.setupForOffset
-  
   return instance
 end
 
@@ -697,6 +697,7 @@ function FSM_Element_ShortSkate:create(handledElem)
   
   instance.name = "Short Skate"
   instance.enumerator = CapElement.FSM_Enum.FSM_Element_ShortSkate
+
   return instance
 end
 
@@ -970,7 +971,6 @@ function FSM_Element_SkateOffsetGrinder:create(handledElem)
   
   --use setup from skateOffset
   instance.setup = self.setupForOffset
-  
   return instance
 end
 

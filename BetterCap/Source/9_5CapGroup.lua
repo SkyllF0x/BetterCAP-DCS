@@ -425,8 +425,8 @@ function CapGroup:create(planes, originalName, route)
   instance.elements = {CapElement:create(planes)}
   instance.countPlanes = #planes
   
-  instance.name = originalName or ("CapGroup-"..tostring(instance.id))
   instance.id = utils.getGroupID()
+  instance.name = originalName or ("CapGroup-"..tostring(instance.id))
   instance.typeName = planes[1]:getTypeName()
   
   instance.point = planes[1]:getPoint() or {x = 0, y = 0, z = 0} --mean point of group is here, now just pos of lead
@@ -900,7 +900,6 @@ function CapGroup:getMaxDistanceToLead()
   return maxRange
 end
 
---return true if current ammoState <= instance.rtbWhen or fuel < bingoFuel
 function CapGroup:needRTB() 
   return self.ammoState <= self.rtbWhen or self:getFuel() < self.bingoFuel
   end
@@ -932,6 +931,8 @@ function CapGroup:mergeElements()
   self.elements[2] = nil
   --delete link
   self.elements[1]:setSecondElement(nil)
+
+  GlobalLogger:create():info(self:getName() .. "mergeElements, now elements is: " .. self.elements[1]:getName())
 end
 
 --split first element to 2 elements
@@ -958,6 +959,9 @@ function CapGroup:splitElement()
     copiedState.id = utils.getGeneralID()
     self.elements[2]:clearFSM()
     self.elements[2]:setFSM_NoCall(copiedState)
+
+    GlobalLogger:create():info(self:getName() .. " Split elements, now elements is: " 
+    .. self.elements[1]:getName() .. " | " .. self.elements[2]:getName())
     return
   end
   
@@ -982,6 +986,9 @@ function CapGroup:splitElement()
   copiedState.id = utils.getGeneralID()
   self.elements[2]:clearFSM()
   self.elements[2]:setFSM_NoCall(copiedState)
+
+  GlobalLogger:create():info(self:getName() .. " Split elements, now elements is: " 
+    .. self.elements[1]:getName() .. " | " .. self.elements[2]:getName())
 end
 
 
@@ -1265,11 +1272,14 @@ function CapGroupRoute:create(planes, objective, squadron)
       squadron:getHomeWP()}
   else
     --else just fly to objectives
-    points = {mist.fixedWing.buildWP(objPoint, "turningpoint", squadron.speed, squadron.alt, squadron.alt_type), squadron:getHomeWP()}
+    points = {
+      squadron:getHomeWP(), 
+      mist.fixedWing.buildWP(objPoint, "turningpoint", squadron.speed, squadron.alt, squadron.alt_type), 
+      squadron:getHomeWP()}
   end
   
   
-  local instance = self:super():create(planes, squadron:getName() .. "-group", GroupRoute:create(points))
+  local instance = self:super():create(planes, squadron:getName() .. "-group-" .. tostring(utils.getGeneralID()) , GroupRoute:create(points))
   instance.sqn = squadron
   instance.objective = objective
   instance.originalSize = #planes

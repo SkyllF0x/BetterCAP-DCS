@@ -189,6 +189,10 @@ function FSM_Element_AbstractCombat:getTargetGroup()
   return self.object.myGroup.target
 end  
 
+function FSM_Element_AbstractCombat:logPrefix()
+  return "Group: " .. self.object.myGroup:getName() .. " Element: " .. self.object:getName()
+end
+
 ----------------------------------------------------
 ---- Abstract combat tactic with tactic inst
 ----------------------------------------------------  

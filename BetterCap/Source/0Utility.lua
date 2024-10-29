@@ -412,7 +412,10 @@ utils.WeaponTypes = {  --USES TYPENAME from getAmmo() DESC
   ["GAR-8"] = {MaxRange = 8000, MAR = 5000},
   ["AIM-9L"] = {MaxRange = 10000, MAR = 6000},
   ["AIM-9P"] = {MaxRange = 9000, MAR = 5000},
+  ["AIM-9P3"] = {MaxRange = 9000, MAR = 5000},
   ["AIM-9P5"] = {MaxRange = 10000, MAR = 5000},
+  ["AIM-9J"] = {MaxRange = 9000, MAR = 5000},
+  ["AIM-9JULI"] = {MaxRange = 9000, MAR = 5000},
   ["AIM_9"] = {MaxRange = 10000, MAR = 6000},
   ["AIM_9X"] = {MaxRange = 12000, MAR = 6000},
   --end of close range
@@ -431,6 +434,8 @@ utils.WeaponTypes = {  --USES TYPENAME from getAmmo() DESC
   ["MICA_T"] = {MaxRange = 40000, MAR = 20000},
   ["MICA_R"] = {MaxRange = 45000, MAR = 22000},
   ["weapons.missiles.AIM_7"] = {MaxRange = 45000, MAR = 20000},
+  ["weapons.missiles.HB-AIM-7E"] = {MaxRange = 45000, MAR = 20000},
+  ["weapons.missiles.HB-AIM-7E-2"] = {MaxRange = 45000, MAR = 20000},
   ["weapons.missiles.AIM-7E"] = {MaxRange = 42000, MAR = 18000},
   ["weapons.missiles.AIM-7MH"] = {MaxRange = 45000, MAR = 20000},
   ["weapons.missiles.AIM-7F"] = {MaxRange = 42000, MAR = 18000},
@@ -443,6 +448,7 @@ utils.WeaponTypes = {  --USES TYPENAME from getAmmo() DESC
 
 --return stub with R-60 when can't find missile in table
 setmetatable(utils.WeaponTypes, {__index = function (self, key)
+      GlobalLogger:create():debug("No missile in table: " .. key)
       return utils.WeaponTypes['default']
     end})
 
@@ -460,7 +466,7 @@ utils.PlanesTypes = {
   ["F-16C bl.50"] = {Missile = utils.WeaponTypes["weapons.missiles.AIM_120C"], RadarRange = 74000},
   ["F-16C bl.52d"] = {Missile = utils.WeaponTypes["weapons.missiles.AIM_120C"], RadarRange = 74000},
   ["F-16C_50"] = {Missile = utils.WeaponTypes["weapons.missiles.AIM_120C"], RadarRange = 74000},
-  ["F-4E"] = {Missile = utils.WeaponTypes["weapons.missiles.AIM_7"], RadarRange = 50000},
+  ["F-4E-45MC"] = {Missile = utils.WeaponTypes["weapons.missiles.AIM_7"], RadarRange = 50000},
   ["F-5E-3"] = {Missile = utils.WeaponTypes["AIM-9P5"], RadarRange = 15000},
   ["F-5E"] = {Missile = utils.WeaponTypes["AIM-9P5"], RadarRange = 15000},
   ["F/A-18A"] = {Missile = utils.WeaponTypes["weapons.missiles.AIM_120C"], RadarRange = 90000},

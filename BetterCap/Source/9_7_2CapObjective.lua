@@ -6,9 +6,26 @@
 ----                  ↓
 ----            CapObjective
 ----------------------------------------------------
+---@module "AnnotationsMeta"
 
+---@class CapObjective
+---@field private id number
+---@field private name string
+---@field zone AbstractZone
+---@field private point vec3
+---@field private requestCap boolean = false
+---@field private requestGci boolean = false
+---@field private priority CapObjective.Priority
+---@field private modifierFigher number
+---@field private modifierOther number 
+---@field private capRequestAmount number
+---@field private maxGciPlanes number
+---@field private threatAircraft number
+---@field private aircraftAssigned number
+---@field private squadrons CapSquadronAir[]
 CapObjective = utils.inheritFrom(AbstractCAP_Handler_Object)
 
+---@enum CapObjective.Priority
 CapObjective.Priority = {}
 CapObjective.Priority.Low = 1     --no CAP, only GCI with (amount of fighters in zone) * 1 + others * 0.25, minimum 2, maximum 4 will be requested
 CapObjective.Priority.Normal = 2  --CAP 2 ship with ALR normal, GCI (amount of fighter) * 1 + others * 0.5, minimum 2
@@ -22,6 +39,8 @@ CapObjective.PriorityModifiers = {
 
 
 --gciZone is CircleZone or ShapeZone which will used for detection target, and also will passed to group
+---@param point vec2 | vec3
+---@return CapObjective
 function CapObjective:create(point, gciZone, useForCap, useForGci, prior, customName)
   local instance = {}
   setmetatable(instance, {__index = self, __eq = utils.compareTables})

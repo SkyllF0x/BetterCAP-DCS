@@ -1,5 +1,5 @@
----Better CAP version: 0.1.2 | Build time: 08.08.2024 1558Z---
-env.info("Better CAP version: 0.1.2 | Build time: 08.08.2024 1558Z")
+---Better CAP version: 0.1.5 added initial annotations | Build time: 29.10.2024 1604Z---
+env.info("Better CAP version: 0.1.5 added initial annotations | Build time: 29.10.2024 1604Z")
 ---------------------------------------------------------------------------
 ---------------------------------------------------------------------------
 --     Source file: 0Utility.lua
@@ -420,7 +420,10 @@ utils.WeaponTypes = {  --USES TYPENAME from getAmmo() DESC
   ["GAR-8"] = {MaxRange = 8000, MAR = 5000},
   ["AIM-9L"] = {MaxRange = 10000, MAR = 6000},
   ["AIM-9P"] = {MaxRange = 9000, MAR = 5000},
+  ["AIM-9P3"] = {MaxRange = 9000, MAR = 5000},
   ["AIM-9P5"] = {MaxRange = 10000, MAR = 5000},
+  ["AIM-9J"] = {MaxRange = 9000, MAR = 5000},
+  ["AIM-9JULI"] = {MaxRange = 9000, MAR = 5000},
   ["AIM_9"] = {MaxRange = 10000, MAR = 6000},
   ["AIM_9X"] = {MaxRange = 12000, MAR = 6000},
   --end of close range
@@ -439,6 +442,8 @@ utils.WeaponTypes = {  --USES TYPENAME from getAmmo() DESC
   ["MICA_T"] = {MaxRange = 40000, MAR = 20000},
   ["MICA_R"] = {MaxRange = 45000, MAR = 22000},
   ["weapons.missiles.AIM_7"] = {MaxRange = 45000, MAR = 20000},
+  ["weapons.missiles.HB-AIM-7E"] = {MaxRange = 45000, MAR = 20000},
+  ["weapons.missiles.HB-AIM-7E-2"] = {MaxRange = 45000, MAR = 20000},
   ["weapons.missiles.AIM-7E"] = {MaxRange = 42000, MAR = 18000},
   ["weapons.missiles.AIM-7MH"] = {MaxRange = 45000, MAR = 20000},
   ["weapons.missiles.AIM-7F"] = {MaxRange = 42000, MAR = 18000},
@@ -451,6 +456,7 @@ utils.WeaponTypes = {  --USES TYPENAME from getAmmo() DESC
 
 --return stub with R-60 when can't find missile in table
 setmetatable(utils.WeaponTypes, {__index = function (self, key)
+      GlobalLogger:create():debug("No missile in table: " .. key)
       return utils.WeaponTypes['default']
     end})
 
@@ -468,7 +474,7 @@ utils.PlanesTypes = {
   ["F-16C bl.50"] = {Missile = utils.WeaponTypes["weapons.missiles.AIM_120C"], RadarRange = 74000},
   ["F-16C bl.52d"] = {Missile = utils.WeaponTypes["weapons.missiles.AIM_120C"], RadarRange = 74000},
   ["F-16C_50"] = {Missile = utils.WeaponTypes["weapons.missiles.AIM_120C"], RadarRange = 74000},
-  ["F-4E"] = {Missile = utils.WeaponTypes["weapons.missiles.AIM_7"], RadarRange = 50000},
+  ["F-4E-45MC"] = {Missile = utils.WeaponTypes["weapons.missiles.AIM_7"], RadarRange = 50000},
   ["F-5E-3"] = {Missile = utils.WeaponTypes["AIM-9P5"], RadarRange = 15000},
   ["F-5E"] = {Missile = utils.WeaponTypes["AIM-9P5"], RadarRange = 15000},
   ["F/A-18A"] = {Missile = utils.WeaponTypes["weapons.missiles.AIM_120C"], RadarRange = 90000},
@@ -521,7 +527,9 @@ end
 -------------------------------------------------------------------
 ---- EventHander signleton which track all related to script objects
 -------------------------------------------------------------------
-
+---@class EventHandler
+---@field private _inst EventHandler?
+---@field private objects ObjectWithEvent[]
 EventHandler = {
   _inst = nil
   }
@@ -537,6 +545,8 @@ function EventHandler:create()
     return self._inst
   end
 
+  ---@param event Event
+  ---@return nil
   function EventHandler:onEvent(event) 
     local result, err = xpcall(function() 
         
@@ -558,14 +568,18 @@ function EventHandler:create()
     end
   end
   
+  ---@param object ObjectWithEvent
   function EventHandler:registerObject(object)  
    self.objects[object:getID()] = object
   end
   
+  ---@param object ObjectWithEvent
   function EventHandler:removeObject(object) 
     self.objects[object:getID()] = nil
   end
   
+  ---Shutdown event handler and delete sigleton, after this call it unusable
+  ---subsequent call to create() will instantiate new intance
   function EventHandler:shutdown() 
     world.removeEventHandler(self)
     EventHandler._inst = nil
@@ -583,17 +597,22 @@ function EventHandler:create()
 
 
 --BASIC ABC for future use
-
+---@class AbstractCAP_Handler_Object
+---@field id number
+---@field name string
 AbstractCAP_Handler_Object = {}
 
+---@return number
 function AbstractCAP_Handler_Object:getID()
   return self.id
 end
 
+---@return string
 function AbstractCAP_Handler_Object:getName()
   return self.name
 end
 
+---@return string
 function AbstractCAP_Handler_Object:getDebugStr(settings) 
   return ""
   end
@@ -603,25 +622,31 @@ function AbstractCAP_Handler_Object:getDebugStr(settings)
 ----                  ↓
 ----           AbstractDCSObject     
 -------------------------------------------------------------------
-
+---@class AbstractDCSObject: AbstractCAP_Handler_Object
+---@field dcsObject table
 AbstractDCSObject = utils.inheritFrom(AbstractCAP_Handler_Object)
 
+---@return Vec3
 function AbstractDCSObject:getPoint()
   return self.dcsObject:getPoint()
 end
 
+---@return Vec3
 function AbstractDCSObject:getVelocity()
   return self.dcsObject:getVelocity()
 end
 
+---@return Position
 function AbstractDCSObject:getPosition()
   return self.dcsObject:getPosition()
 end
 
+---@return Controller
 function AbstractDCSObject:getController() 
   return self.dcsObject:getController()
 end
 
+---@return boolean
 function AbstractDCSObject:isExist()
   --double check cause dcs can fail to report in some cases
   if self.dcsObject then
@@ -647,10 +672,17 @@ end
 ----                  ↓
 ----             DCS_Wrapper
 ----------------------------------------------------
+---@class DCS_Wrapper: AbstractDCSObject
+---@field typeName string
+---@field name string
+---@field id number
 DCS_Wrapper = utils.inheritFrom(AbstractDCSObject)
 
+---@param dcsObject table
+---@return DCS_Wrapper
 function DCS_Wrapper:create(dcsObject) 
   local instance = {}
+  ---@protected
   instance.dcsObject = dcsObject
   instance.typeName = dcsObject:getTypeName()
   instance.name = dcsObject:getName()
@@ -658,14 +690,17 @@ function DCS_Wrapper:create(dcsObject)
   return setmetatable(instance, {__index = self, __eq = utils.compareTables})
 end
 
+---@return string
 function DCS_Wrapper:getTypeName() 
   return self.typeName
 end
 
+---@return table
 function DCS_Wrapper:getObject()
   return self.dcsObject
 end
 
+---@return boolean
 function DCS_Wrapper:hasAttribute(attr) 
   return self.dcsObject:hasAttribute(attr)
 end
@@ -685,16 +720,19 @@ end
 ----                  ↓
 ----           ObjectWithEvent
 ----------------------------------------------------
-
+---@class ObjectWithEvent: DCS_Wrapper
+---@field create fun(self, dcsObject: table): ObjectWithEvent
 ObjectWithEvent = utils.inheritFrom(DCS_Wrapper)
 
---to detect shots
+---to detect shots
+---@param event Event
 function ObjectWithEvent:shotEvent(event) 
   
 end
 
 
---will be used to detect shutdown of aircraft
+---will be used to detect shutdown of aircraft
+---@param event Event
 function ObjectWithEvent:engineOffEvent(event) 
   
 end
@@ -713,12 +751,19 @@ end
 -- Container for detected object, wrapper around default detection table
 -- https://wiki.hoggitworld.com/view/DCS_func_getDetectedTargets
 ----------------------------------------------------    
-
+---@class TargetContainer
+---@field private dcsObject table
+---@field private detector AbstractDCSObject
+---@field private typeKnown boolean
+---@field private rangeKnown boolean
 TargetContainer = {}
 
+---@param dcsDetectionTable DCSDetectionTable
+---@param detectorObject AbstractDCSObject
+---@return TargetContainer
 function TargetContainer:create(dcsDetectionTable, detectorObject)   
   local instance = {}
-    
+
   instance.dcsObject = dcsDetectionTable.object
   instance.detector = detectorObject
   instance.typeKnown = dcsDetectionTable.type
@@ -729,18 +774,22 @@ function TargetContainer:create(dcsDetectionTable, detectorObject)
   return setmetatable(instance, {__index = self})
 end
 
+---@return table
 function TargetContainer:getTarget() 
   return self.dcsObject
 end
 
+---@return AbstractDCSObject
 function TargetContainer:getDetector()
   return self.detector
 end
 
+---@return boolean
 function TargetContainer:isTypeKnown() 
   return self.typeKnown
 end
 
+---@return boolean
 function TargetContainer:isRangeKnown() 
   return self.rangeKnown
   end
@@ -751,14 +800,22 @@ function TargetContainer:isRangeKnown()
 ----------------------------------------------------    
 -- AbstractTarget object
 ----------------------------------------------------    
+---@class AbstractTarget
+---@field protected currentROE AbstractTarget.ROE
+---@field protected typeModifier AbstractTarget.TypeModifier
+---@field protected targeted boolean
 AbstractTarget = {}
-AbstractTarget.ROE = {}
-AbstractTarget.ROE.Bandit = 1  --target outside border, will not be attacket until shot to friendlies
-AbstractTarget.ROE.Hostile = 2 --valid target
-AbstractTarget.TypeModifier = {}
-AbstractTarget.TypeModifier.FIGHTER = 1
-AbstractTarget.TypeModifier.ATTACKER = 2
-AbstractTarget.TypeModifier.HELI = 3
+---@enum AbstractTarget.ROE
+AbstractTarget.ROE = {
+  Bandit = 1,  --target outside border, will not be attacket until shot to friendlies
+  Hostile = 2 --valid target
+}
+---@enum AbstractTarget.TypeModifier
+AbstractTarget.TypeModifier = {
+  FIGHTER = 1,
+  ATTACKER = 2,
+  HELI = 3
+}
 
 AbstractTarget.names = {}
 AbstractTarget.names.ROE = {
@@ -771,19 +828,18 @@ AbstractTarget.names.typeModifier = {
   [AbstractTarget.TypeModifier.HELI] = "HELI"
 }
 
-
+---update ROE for target
+---@param roeEnum AbstractTarget.ROE
 function AbstractTarget:setROE(roeEnum) 
   self.currentROE = roeEnum
 end
 
+---@return AbstractTarget.ROE
 function AbstractTarget:getROE() 
   return self.currentROE 
 end
 
-function AbstractTarget:setTargeted(value) 
-  self.targeted = value
-end
-
+---@return boolean
 function AbstractTarget:getTargeted() 
   return self.targeted
 end
@@ -794,6 +850,7 @@ function AbstractTarget:setTargeted(newVal)
 end
 
 --type of target( FIGHTER or ATTACKER )used for priority calc
+---@return AbstractTarget.TypeModifier
 function AbstractTarget:getTypeModifier() 
   return self.typeModifier
 end
@@ -813,11 +870,24 @@ end
 ----                  ↓                  ↓
 ----               Target  <-------------    
 ----------------------------------------------------  
+---@class Target: AbstractTarget, ObjectWithEvent
+---@field private holdTime number how long keep extrapolate contact until drop
+---@field private point Vec3 calculated point
+---@field private position Position calculated data for getPosition()
+---@field private velocity Vec3 calculated velocity
+---@field private deltaVelocity Vec3 
+---@field private lastSeen {['L1']: number, ["L2"]: number, ["L3"]: number} 
+---@field private seenBy TargetContainer[] all containers contains this target in current detection frame
+---@field private controllType Target.ControlType
+---@field private shooter boolean
 Target = utils.inheritFromMany(AbstractTarget, ObjectWithEvent)
-Target.ControlType = {}
-Target.ControlType.LEVEL1 = 1
-Target.ControlType.LEVEL2 = 2
-Target.ControlType.LEVEL3 = 3
+
+---@enum Target.ControlType
+Target.ControlType = {
+LEVEL1 = 1,
+LEVEL2 = 2,
+LEVEL3 = 3
+}
 
 --for message forming
 Target.names = {}
@@ -827,9 +897,13 @@ Target.names.ControlType = {
   [Target.ControlType.LEVEL3] = "L3"
   }
 
+  ---@param targetContainer TargetContainer
+  ---@param extrapolateTime number
+  ---@return Target
 function Target:create(targetContainer, extrapolateTime) 
   local instance = ObjectWithEvent:create(targetContainer:getTarget())--call explicitly
   setmetatable(instance, {__index = self, __eq = utils.compareTables})
+  ---@cast instance Target
   
   local zeroVec = {x = 0, y = 0, z = 0}
   
@@ -844,7 +918,7 @@ function Target:create(targetContainer, extrapolateTime)
   
   instance.currentROE = AbstractTarget.ROE.Bandit
   instance.targeted = false
-  instance.shooter = false --flag shows this target shoot at us
+  instance.shooter = false --flag shows this target shoot at object belonging to our coalition
   instance.typeName = "Unknown" --leave unknown so it will be populate by updateTypes() in first run if type known
   instance.typeKnown = false --leave false so it will be populate by updateTypes() in first run if type known
   instance.typeModifier = AbstractTarget.TypeModifier.ATTACKER
@@ -859,6 +933,7 @@ function Target:create(targetContainer, extrapolateTime)
   return instance
 end
 
+---@return string
 function Target:getDebugStr() 
   return self:getName() .. " targeted: " .. tostring(self.targeted) .. " | ROE: " .. AbstractTarget.names.ROE[self.currentROE] .. " | Type: " .. self:getTypeName() 
     .. " | TypeMod: " .. AbstractTarget.names.typeModifier[self.typeModifier] .. " | Control: " .. Target.names.ControlType[self.controlType] .. "\n" 
@@ -868,10 +943,11 @@ function Target:engineOffEvent(event)
   --not interested in this
 end
 
+---@param event ShotEvent
 function Target:shotEvent(event) 
   local t = event.weapon:getTarget()
     
-    if t and event.initiator == self.dcsObject then 
+    if t and event.initiator == self.dcsObject and event.weapon:getDesc().category == Weapon.Category.MISSILE then 
       local coal = t:getCoalition()
       if coal ~= self.dcsObject:getCoalition() and coal ~= 0 then --if it no friendly fire or attack neutral so it attack us(thankfull dcs not model multunational war)
         self.shooter = true
@@ -879,6 +955,7 @@ function Target:shotEvent(event)
     end
   end
   
+---@return boolean
 function Target:isExist() 
   --we can magically know target alive or not
   if self.dcsObject and self.dcsObject:isExist() and not self:isOutages() then 
@@ -889,28 +966,35 @@ function Target:isExist()
   return false
 end
 
+---@return boolean
 function Target:isShooter() 
   return self.shooter
   end
 
+  ---@return Vec3
 function Target:getPoint() 
   return self.point
 end
 
+---@return Position
 function Target:getPosition() 
   return self.position
 end
 
+---@return Vec3
 function Target:getVelocity() 
   return self.velocity
 end
 
+---@return number
 function Target:getSpeed() 
   --small helper
   return mist.vec.mag(self.velocity)
 end
 
 --return AOB for point
+---@param point Vec3
+---@return number
 function Target:getAA(point) 
   local targetVel = self.velocity
   
@@ -926,6 +1010,7 @@ function Target:getAA(point)
   end
 
 --this object was detected
+---@param targetContainer TargetContainer
 function Target:hasSeen(targetContainer)
   self.seenBy[#self.seenBy+1] = targetContainer
 end
@@ -1030,6 +1115,7 @@ function Target:updateType()
   end
 end
 
+---@return boolean
 function Target:isOutages() 
   return timer.getAbsTime() - self.lastSeen.L2 >= self.holdTime and timer.getAbsTime() - self.lastSeen.L1 >= self.holdTime
   end
@@ -1058,7 +1144,6 @@ function Target:update()
   self:updateLEVEL2()
   return
 end
-
 
 ---------------------------------------------------------------------------
 ---------------------------------------------------------------------------
@@ -2098,6 +2183,7 @@ function AirContainer:activate()
     --shift pos
     groupPos = mist.vec.add(groupPos, shiftVec)
   end
+  
   
   return result
 end
@@ -3553,6 +3639,10 @@ function FSM_Element_AbstractCombat:getTargetGroup()
   return self.object.myGroup.target
 end  
 
+function FSM_Element_AbstractCombat:logPrefix()
+  return "Group: " .. self.object.myGroup:getName() .. " Element: " .. self.object:getName()
+end
+
 ----------------------------------------------------
 ---- Abstract combat tactic with tactic inst
 ----------------------------------------------------  
@@ -4655,6 +4745,7 @@ function FSM_Element_Skate:create(handledElem)
   else
     instance.ALR_check = self.checkAttackHigh
   end
+
   return setmetatable(instance, {__index = self, __eq = utils.compareTables})
 end
 
@@ -4887,7 +4978,6 @@ function FSM_Element_SkateOffset:create(handledElem)
   
   --use setup from skateOffset
   instance.setup = self.setupForOffset
-  
   return instance
 end
 
@@ -4997,6 +5087,7 @@ function FSM_Element_ShortSkate:create(handledElem)
   
   instance.name = "Short Skate"
   instance.enumerator = CapElement.FSM_Enum.FSM_Element_ShortSkate
+
   return instance
 end
 
@@ -5270,7 +5361,6 @@ function FSM_Element_SkateOffsetGrinder:create(handledElem)
   
   --use setup from skateOffset
   instance.setup = self.setupForOffset
-  
   return instance
 end
 
@@ -6000,6 +6090,7 @@ function CapElement:registerGroup(capGroup)
   self.myGroup = capGroup
   end
 
+
 --return true if any of aircraft has RWR indication of any of contacts
 --in listContacts
 function CapElement:isSpikedBy(listContacts) 
@@ -6039,7 +6130,6 @@ function CapElement:sortByAmmo()
 end
 
 
-
 function CapElement:setSecondElement(element) 
   self.secondElement = element
   end
@@ -6060,8 +6150,6 @@ function CapElement:callFSM()
   self:callPlanes()
   self.FSM_args = {}
 end
-
-
 
 ---------------------------------------------------------------------------
 ---------------------------------------------------------------------------
@@ -6496,8 +6584,8 @@ function CapGroup:create(planes, originalName, route)
   instance.elements = {CapElement:create(planes)}
   instance.countPlanes = #planes
   
-  instance.name = originalName or ("CapGroup-"..tostring(instance.id))
   instance.id = utils.getGroupID()
+  instance.name = originalName or ("CapGroup-"..tostring(instance.id))
   instance.typeName = planes[1]:getTypeName()
   
   instance.point = planes[1]:getPoint() or {x = 0, y = 0, z = 0} --mean point of group is here, now just pos of lead
@@ -6971,7 +7059,6 @@ function CapGroup:getMaxDistanceToLead()
   return maxRange
 end
 
---return true if current ammoState <= instance.rtbWhen or fuel < bingoFuel
 function CapGroup:needRTB() 
   return self.ammoState <= self.rtbWhen or self:getFuel() < self.bingoFuel
   end
@@ -7003,6 +7090,8 @@ function CapGroup:mergeElements()
   self.elements[2] = nil
   --delete link
   self.elements[1]:setSecondElement(nil)
+
+  GlobalLogger:create():info(self:getName() .. "mergeElements, now elements is: " .. self.elements[1]:getName())
 end
 
 --split first element to 2 elements
@@ -7029,6 +7118,9 @@ function CapGroup:splitElement()
     copiedState.id = utils.getGeneralID()
     self.elements[2]:clearFSM()
     self.elements[2]:setFSM_NoCall(copiedState)
+
+    GlobalLogger:create():info(self:getName() .. " Split elements, now elements is: " 
+    .. self.elements[1]:getName() .. " | " .. self.elements[2]:getName())
     return
   end
   
@@ -7053,6 +7145,9 @@ function CapGroup:splitElement()
   copiedState.id = utils.getGeneralID()
   self.elements[2]:clearFSM()
   self.elements[2]:setFSM_NoCall(copiedState)
+
+  GlobalLogger:create():info(self:getName() .. " Split elements, now elements is: " 
+    .. self.elements[1]:getName() .. " | " .. self.elements[2]:getName())
 end
 
 
@@ -7336,11 +7431,14 @@ function CapGroupRoute:create(planes, objective, squadron)
       squadron:getHomeWP()}
   else
     --else just fly to objectives
-    points = {mist.fixedWing.buildWP(objPoint, "turningpoint", squadron.speed, squadron.alt, squadron.alt_type), squadron:getHomeWP()}
+    points = {
+      squadron:getHomeWP(), 
+      mist.fixedWing.buildWP(objPoint, "turningpoint", squadron.speed, squadron.alt, squadron.alt_type), 
+      squadron:getHomeWP()}
   end
   
   
-  local instance = self:super():create(planes, squadron:getName() .. "-group", GroupRoute:create(points))
+  local instance = self:super():create(planes, squadron:getName() .. "-group-" .. tostring(utils.getGeneralID()) , GroupRoute:create(points))
   instance.sqn = squadron
   instance.objective = objective
   instance.originalSize = #planes
@@ -7521,6 +7619,7 @@ function FSM_GroupStart:run(arg)
     return
   end
   
+  GlobalLogger:create():debug(self.object:getName() .. " airborne, push to FlyRoute")
   self.object:setFSM(FSM_FlyRoute:create(self.object))
 end
 
@@ -7555,6 +7654,8 @@ function FSM_GroupChecks:checkAttack(contacts)
   end
   
   if tgt.range > tgt.commitRange then 
+    GlobalLogger:create():debug(self.object:getName() .. " go commit on: " .. tgt.target:getName() .. " range: " 
+      .. tostring(tgt.range) .. " CR: " .. tostring(tgt.commitRange))
     self.object:setFSM(FSM_Commit:create(self.object, tgt.target))
     return true
   end
@@ -7651,6 +7752,8 @@ function FSM_Rejoin:create(handledGroup)
 end
 
 function FSM_Rejoin:setup() 
+  GlobalLogger:create():info(self.object:getName() .. " FSM_Rejoin:setup(), range to lead " .. tostring(self.object:getMaxDistanceToLead()))
+
   self.object:mergeElements()
   self.object.elements[1]:clearFSM()
   
@@ -7671,6 +7774,7 @@ function FSM_Rejoin:run(arg)
     return
   end
 
+  GlobalLogger:create():info(self.object:getName() .. " rejoin complete")
   --we close enough, return to prev state
   self.object:popFSM()
 end
@@ -7701,22 +7805,32 @@ function FSM_GroupRTB:create(handledGroup)
   return setmetatable(instance, {__index = self, __eq = utils.compareTables})
   end
 
-
 function FSM_GroupRTB:setup() 
   self.object:setAutonomous(false)
   self.object:mergeElements()
   self.object.elements[1]:clearFSM()
   
   --prohibit AB using
+  --allow infinite fuel, or can crash
   for _, plane in self.object:planes() do 
     plane:setOption(CapPlane.options.BurnerUse, utils.tasks.command.Burner_Use.Off)
+    plane:getController():setCommand({ 
+      id = 'SetUnlimitedFuel', 
+      params = { 
+        value = true 
+      } 
+    })
     end
   
   --if homeBase if airfield, fly as singletons, set FSM_PlaneRTB, if it just a point set FlyToPoint
   if self.object.route:hasAirfield() then 
+    GlobalLogger:create():info(self.object:getName() .. " FSM_GroupRTB:setup(), RTB to airfield")
+
     self.object.elements[1]:setFSM(FSM_Element_FlySeparatly:create(self.object.elements[1], FSM_PlaneRTB, self.waypoint))
   else
-    --create waypoint at wp postion at altitude of 5000m, use standart fly in formation
+    GlobalLogger:create():info(self.object:getName() .. " FSM_GroupRTB:setup(), RTB to WP")
+
+    --create waypoint at wp position at altitude of 5000m, use standart fly in formation
     self.object.elements[1]:setFSM(FSM_Element_FlyFormation:create(self.object.elements[1], FSM_FlyToPoint, 
         mist.fixedWing.buildWP(self.waypoint, "turningpoint", 250, 5000, "BARO")))
   end
@@ -7830,6 +7944,8 @@ function FSM_FlyRoute:setup()
         self.object.elements[1], FSM_FlyToPoint, mist.fixedWing.buildWP(self.object.route:getHomeBase(), "turningpoint", 200, 8000, "BARO")))
     
     self:setTargetSpeed(200)
+    
+    GlobalLogger:create():info(self.object:getName() .. " FSM_FlyRoute:setup(), fly toward home")
     return
   end
   
@@ -7838,7 +7954,6 @@ function FSM_FlyRoute:setup()
   --update target speed
   self:setTargetSpeed(self.object.route:getCurrentWaypoint().speed)
 end
-
 
 
  --check approach for any of patrols zones for current WP, and if so 
@@ -7913,6 +8028,8 @@ function FSM_Deactivate:run(arg)
   
   --wipe elements
   self.object.elements = {}
+
+  GlobalLogger:create():info(self.object:getName() .. " FSM_Deactivate:run() deactivate group")
   end
 
 ----------------------------------------------------
@@ -7930,6 +8047,7 @@ FSM_Deactivate_Route = utils.inheritFrom(FSM_Deactivate)
 
 function FSM_Deactivate_Route:setup() 
   --return remaining aircraft to squadron
+  GlobalLogger:create():info(self.object:getName() .. " FSM_Deactivate_Route:setup(), return planes: " .. tostring(self.object.countPlanes))
   self.object.sqn:returnAircrafts(self.object.countPlanes)
 end
 
@@ -7964,6 +8082,8 @@ end
 function FSM_Commit:setup() 
 
   if not (self.object.target and self.object.target:isExist()) then 
+    GlobalLogger:create():info(self.object:getName() .. " FSM_Commit:setup() no target")
+
     --no target, continue unwind
     self.object:popFSM()
     return
@@ -8080,6 +8200,7 @@ function FSM_Engaged:selectTactic()
   for enum, weight in pairs(tblWithWeights) do 
     local newRange = prevRange + stepSize*weight
     if prevRange <= randomChoice and randomChoice <= newRange then 
+
       return self.tactics[enum]
     end
     prevRange = newRange
@@ -8092,6 +8213,7 @@ function FSM_Engaged:setup()
   self.object:setAutonomous(true)
   
   self.tactic = self:selectTactic()
+
   for _, elem in pairs(self.object.elements) do 
     elem:clearFSM()
     elem:setFSM(self.tactic:create(elem))
@@ -8119,12 +8241,12 @@ function FSM_Engaged:run(arg)
   if self.object.ammoState <= self.object.rtbWhen or self.object:getFuel() < (self.object.bingoFuel + 0.1) then 
     self.object:popFSM_NoCall()
     self.object:setFSM(FSM_Pump:create(self.object))
-    GlobalLogger:create():info(self.object:getName() .. " exit, need RTB")
+    GlobalLogger:create():info(self.object:getName() .. " FSM_Engaged: exit, need RTB")
     return
     
   elseif not self.object.target:isExist() then
     --target dead, return
-    GlobalLogger:create():info(self.object:getName() .. " exit, target dead")
+    GlobalLogger:create():info(self.object:getName() .. " FSM_Engaged: exit, target dead")
     self.object:popFSM()
     return
   end
@@ -8134,7 +8256,7 @@ function FSM_Engaged:run(arg)
   local tgt = self.object:checkTargets(arg.contacts)
   if not tgt.target then 
     --no target for commit
-    GlobalLogger:create():info(self.object:getName() .. " exit, no more targets")
+    GlobalLogger:create():info(self.object:getName() .. " FSM_Engaged: exit, no more targets")
     self.object:popFSM()
     return
   
@@ -8144,7 +8266,7 @@ function FSM_Engaged:run(arg)
     local commitRange = tgt.commitRange
     if commitRange + 18500 < tgt.range then
       
-      GlobalLogger:create():info(self.object:getName() .. " drop target, range: " .. tostring(tgt.range) .. " cr: " .. tostring(commitRange))
+      GlobalLogger:create():info(self.object:getName() .. " FSM_Engaged: drop target, range: " .. tostring(tgt.range) .. " cr: " .. tostring(commitRange))
       self.object:popFSM()
       return
     end
@@ -8157,7 +8279,7 @@ function FSM_Engaged:run(arg)
     
     if tgt.priority/ourTargetPriority >= 1.1 then
 
-      GlobalLogger:create():debug(self.object:getName() .. " set new target for group: " .. tgt.target:getName())
+      GlobalLogger:create():debug(self.object:getName() .. " FSM_Engaged: set new target for group: " .. tgt.target:getName())
       --update target
       self.object.target:setTargeted(false)
       tgt.target:setTargeted(true)
@@ -8184,7 +8306,7 @@ function FSM_Engaged:checkForSplit(targets)
   if not (closestTarget.target and closestTarget.target ~= self.object.target) then 
     return
   end
-  GlobalLogger:create():debug(self.object:getName() .. " SPLIT")
+  GlobalLogger:create():info(self.object:getName() .. " FSM_Engaged: Split elements")
 
   --split group, first element continue attack original target
   --no range check, should pop manually
@@ -8231,7 +8353,7 @@ function FSM_Engaged:checkForRejoin(targets)
     return
   end
   
-  GlobalLogger:create():debug(self.object:getName() .. " return from SPLIT")
+  GlobalLogger:create():info(self.object:getName() .. " FSM_Engaged: rejoin elements")
   self.object.elements[1]:popFSM_NoCall()
 end
 
@@ -8264,11 +8386,20 @@ function FSM_Pump:setup()
   --allow usage of afterburner
   for _, plane in self.object:planes() do 
     plane:setOption(CapPlane.options.BurnerUse, utils.tasks.command.Burner_Use.On)
+    --set infinite fuel
+    plane:getController():setCommand({ 
+      id = 'SetUnlimitedFuel', 
+      params = { 
+        value = true 
+      } 
+    })
   end
   
   --convert to vec2 or it will use speed/alt from point
   local wp = mist.fixedWing.buildWP(mist.utils.makeVec2(self.object.route:getHomeBase()), "turningpoint", 500, 7000, "BARO")
   self.object.elements[1]:setFSM(FSM_Element_FlySeparatly:create(self.object.elements[1], FSM_FlyToPoint, wp))
+
+  GlobalLogger:create():info(self.object:getName() .. " FSM_Pump:setup() done")
 end
   
 function FSM_Pump:teardown() 
@@ -8327,6 +8458,8 @@ function FSM_PatrolZone:create(handledGroup, zone)
 end
 
 function FSM_PatrolZone:setup() 
+  GlobalLogger:create():info(self.object:getName() .. " FSM_PatrolZone:setup()")
+
   self.object:mergeElements()
   self.object.elements[1]:clearFSM()
   
@@ -8352,8 +8485,6 @@ function FSM_PatrolZone:run(arg)
     return
   end
 end
-
-
 
 ---------------------------------------------------------------------------
 ---------------------------------------------------------------------------
@@ -8581,12 +8712,14 @@ function DetectionHandler:updateRadars()
   
   for _, groundRadar in pairs(self.radars) do 
     if not groundRadar:isExist() then 
+      GlobalLogger:create():debug("Ground radar: " .. groundRadar:getName() .. " dead")
       self.radars[groundRadar:getID()] = nil
     end
   end
     
   for _, airGroup in pairs(self.airborneRadars) do 
     if not airGroup:isExist() or not airGroup:getAutonomous() then
+      GlobalLogger:create():debug("Airborne radar: " .. airGroup:getName() .. " dead")
       self.airborneRadars[airGroup:getID()] = nil
     end
   end
@@ -8785,9 +8918,26 @@ function DetectionHandler:update()
 ----                  ↓
 ----            CapObjective
 ----------------------------------------------------
+---@module "AnnotationsMeta"
 
+---@class CapObjective
+---@field private id number
+---@field private name string
+---@field zone AbstractZone
+---@field private point vec3
+---@field private requestCap boolean = false
+---@field private requestGci boolean = false
+---@field private priority CapObjective.Priority
+---@field private modifierFigher number
+---@field private modifierOther number 
+---@field private capRequestAmount number
+---@field private maxGciPlanes number
+---@field private threatAircraft number
+---@field private aircraftAssigned number
+---@field private squadrons CapSquadronAir[]
 CapObjective = utils.inheritFrom(AbstractCAP_Handler_Object)
 
+---@enum CapObjective.Priority
 CapObjective.Priority = {}
 CapObjective.Priority.Low = 1     --no CAP, only GCI with (amount of fighters in zone) * 1 + others * 0.25, minimum 2, maximum 4 will be requested
 CapObjective.Priority.Normal = 2  --CAP 2 ship with ALR normal, GCI (amount of fighter) * 1 + others * 0.5, minimum 2
@@ -8801,6 +8951,8 @@ CapObjective.PriorityModifiers = {
 
 
 --gciZone is CircleZone or ShapeZone which will used for detection target, and also will passed to group
+---@param point vec2 | vec3
+---@return CapObjective
 function CapObjective:create(point, gciZone, useForCap, useForGci, prior, customName)
   local instance = {}
   setmetatable(instance, {__index = self, __eq = utils.compareTables})
@@ -9109,6 +9261,7 @@ end
 ----            CapSquadronAir
 ----------------------------------------------------
 
+---@class CapSquadronAir: AbstractCAP_Handler_Object
 CapSquadronAir = utils.inheritFrom(AbstractCAP_Handler_Object)
 CapSquadronAir.FSM_Enum = {
   CapSquadronReady = 101,
@@ -9121,6 +9274,7 @@ CapSquadronAir.Priority.LOW = 1.25
 CapSquadronAir.Priority.NORMAL = 1
 CapSquadronAir.Priority.HIGH = 0.75
 
+---@return CapSquadronAir
 function CapSquadronAir:create(prototypeGroupName, aircraftReady, aircraftAvail, preflightTime, combatRadius, priority) 
   
   local instance = {}
@@ -9133,7 +9287,7 @@ function CapSquadronAir:create(prototypeGroupName, aircraftReady, aircraftAvail,
   local g = Group.getByName(prototypeGroupName)
   
   if not rawget(utils.PlanesTypes, g:getUnit(1):getTypeName()) then 
-    utils.printToSim("Group: " .. prototypeGroupName .. " -> THIS AIRCRAFT TYPE NO SUPPORTED, SKIPPED")
+    utils.printToSim("Group: " .. prototypeGroupName .. " -> THIS AIRCRAFT TYPE NO SUPPORTED, SKIPPED, TYPE: " .. g:getUnit(1):getTypeName())
     return 
   end
   
@@ -9534,6 +9688,7 @@ function CapSquadronCold:getDebugStr()
 CapSquadron = {}
 CapSquadron.Priority = CapSquadronAir.Priority
 
+---@return CapSquadronAir
 function CapSquadron:create(groupName, aircraftReady, aircraftTotal, preflightTime, combatRange, priority) 
   local firstPoint = mist.getGroupRoute(groupName)[1]
   
@@ -9853,39 +10008,43 @@ function GlobalLogger:printToSim(levelStr, message, level)
 end
 
 function GlobalLogger:debug(message) 
+  self:printToSim("DEBUG: ", message, GlobalLogger.LEVELS.DEBUG)
+
   if self.settings.level > GlobalLogger.LEVELS.DEBUG then 
     return
   end
   
   self:printToLog("DEBUG: ", message)
-  self:printToSim("DEBUG: ", message, GlobalLogger.LEVELS.DEBUG)
 end
 
 function GlobalLogger:info(message) 
+  self:printToSim("INFO: ", message, GlobalLogger.LEVELS.INFO)
+
   if self.settings.level > GlobalLogger.LEVELS.INFO then 
     return
   end
   
   self:printToLog("INFO: ", message)
-  self:printToSim("INFO: ", message, GlobalLogger.LEVELS.INFO)
 end
 
 function GlobalLogger:warning(message) 
+  self:printToSim("WARNING: ", message, GlobalLogger.LEVELS.WARNING)
+
   if self.settings.level > GlobalLogger.LEVELS.WARNING then 
     return
   end
   
   self:printToLog("WARNING: ", message)
-  self:printToSim("WARNING: ", message, GlobalLogger.LEVELS.WARNING)
 end
 
 function GlobalLogger:error(message) 
+  self:printToSim("WARNING: ", message, GlobalLogger.LEVELS.WARNING)
+
   if self.settings.level > GlobalLogger.LEVELS.ERROR then 
     return
   end
   
   self:printToLog("ERROR: ", message)
-  self:printToSim("ERROR: ", message, GlobalLogger.LEVELS.ERROR)
 end
 
 function GlobalLogger:drawPoint(data)
@@ -10086,7 +10245,7 @@ function AbstractMainloop:spawnGroup(container)
       self.groups[group:getID()] = group
       self.groupErrors[group:getID()] = 0
       
-      GlobalLogger:create():info(container:getName() .. " is activated")
+      GlobalLogger:create():info(group:getName() .. " activated with: " .. tostring(group:getOriginalSize()) .. " planes")
     end, debug.traceback)
 
   if not result then 
@@ -10131,8 +10290,9 @@ AiHandler.coalition = AbstractMainloop.coalition
 function AiHandler:addGroup(group) 
 
   if not rawget(utils.PlanesTypes, group:getUnit(1):getTypeName()) then
-    utils.printToSim("GROUP: " .. group:getName() .. " SKIPPED, NOT SUPPORTED TYPE")
-    GlobalLogger:create():error("GROUP: " .. group:getName() .. " SKIPPED, NOT SUPPORTED TYPE")
+    local msg = "GROUP: " .. group:getName() .. " SKIPPED, NOT SUPPORTED TYPE: " .. group:getUnit(1):getTypeName()
+    utils.printToSim(msg)
+    GlobalLogger:create():error(msg)
     return
   end
   
@@ -10402,7 +10562,7 @@ function GciCapHandler:spawnGroup(container)
       self.groups[group:getID()] = group
       self.groupErrors[group:getID()] = 0
       
-      GlobalLogger:create():info(container:getName() .. " is activated")
+      GlobalLogger:create():info(group:getName() .. " is activated with " .. tostring(group:getOriginalSize() .. " planes"))
     end, debug.traceback)
 
   if not result then 
@@ -10564,7 +10724,6 @@ function GciCapHandler:checkCap()
     
     --no check for airborneGroupLimit because createNewGroupsFromSqn() won't spawn group if counter full
     if capNeeded >= minSize then 
-      
       --don't need planes now, request non ready group
       self:spawnAircraftsForObjective(objective, capNeeded, false) 
     end
