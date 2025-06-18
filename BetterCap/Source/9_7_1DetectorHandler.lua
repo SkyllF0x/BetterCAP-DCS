@@ -216,17 +216,34 @@ function DetectionHandler:getHostileTargets()
 --delete capGroup if it dead or not autonomous 
 function DetectionHandler:updateRadars() 
   
-  for _, groundRadar in pairs(self.radars) do 
-    if not groundRadar:isExist() then 
-      GlobalLogger:create():debug("Ground radar: " .. groundRadar:getName() .. " dead")
-      self.radars[groundRadar:getID()] = nil
+  for id, groundRadar in pairs(self.radars) do 
+    local result, err = xpcall(
+      function()       
+        if not groundRadar:isExist() then 
+          GlobalLogger:create():debug("Ground radar: " .. groundRadar:getName() .. " dead")
+          self.radars[groundRadar:getID()] = nil
+        end
+      end,
+      debug.traceback)
+    
+    if not result then 
+      GlobalLogger:create():error("DetectionHandler: error during radar update,delete " .. mist.utils.serialize("\n traceback", err))
+      self.radars[id] = nil
     end
   end
     
-  for _, airGroup in pairs(self.airborneRadars) do 
+  for id, airGroup in pairs(self.airborneRadars) do 
     if not airGroup:isExist() or not airGroup:getAutonomous() then
-      GlobalLogger:create():debug("Airborne radar: " .. airGroup:getName() .. " dead")
-      self.airborneRadars[airGroup:getID()] = nil
+
+      local result, err = xpcall(function()
+        GlobalLogger:create():debug("Airborne radar: " .. airGroup:getName() .. " dead")
+        self.airborneRadars[id] = nil
+      end, debug.traceback)
+
+      if not result then 
+        GlobalLogger:create():error("DetectionHandler: error during radar update,delete " .. mist.utils.serialize("\n traceback", err))
+        self.airborneRadars[id] = nil
+      end
     end
   end
 end
@@ -249,20 +266,35 @@ end
 function DetectionHandler:askRadars() 
   local contacts = {}
   
-  for _, radar in pairs(self:getRadars()) do 
-    for __, target in pairs(radar:getDetectedTargets()) do 
-      contacts[#contacts+1] = target
+  for id, radar in pairs(self:getRadars()) do 
+
+    local res, _err = xpcall(function()
+      for __, target in pairs(radar:getDetectedTargets()) do 
+        contacts[#contacts+1] = target
+      end
+    end, debug.traceback)
+    if not res then 
+        GlobalLogger:create():warning("DetectionHandler:askRadars bad radar ask " .. tostring(_err))
+        self.radars[id] = nil
     end
   end
   
-  for _, radar in pairs(self.airborneRadars) do 
-    for __, target in pairs(radar:getDetectedTargets()) do 
-      contacts[#contacts+1] = target
+  for id, radar in pairs(self.airborneRadars) do 
+
+    local res, _err = xpcall(function()
+      for __, target in pairs(radar:getDetectedTargets()) do 
+        contacts[#contacts+1] = target
+      end
+    end, debug.traceback)
+    if not res then 
+        GlobalLogger:create():warning("DetectionHandler:askRadars bad AIR radar ask " .. tostring(_err))
+        self.airborneRadars[id] = nil
     end
   end
   
   return contacts
   end
+
 
 --try update existed targets with containers from contacts
 --containers which wasn't accepted

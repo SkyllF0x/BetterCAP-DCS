@@ -329,8 +329,22 @@ function CapPlane:callFSM()
   
   --vipe args
   self.FSM_args = {}
+  self.FSM_stack:resetCounter()
   end
 
+
+function CapPlane:getDebugDump()
+  local result = {
+    exist = utils.getInProcected(self.isExist, self),
+    inAir = utils.getInProcected(self.inAir, self),
+    FSM_Stack = self.FSM_stack,
+    point = utils.getInProcected(self.getPoint, self),
+    ammo = utils.getInProcected(self.getAmmo, self),
+    bestMissile = utils.getInProcected(self.getBestMissile, self),
+    fuel = utils.getInProcected(self.getFuel, self)
+  }
+  return result
+end
 ----------------------------------------------------
 -- end CapPlane
 ----------------------------------------------------

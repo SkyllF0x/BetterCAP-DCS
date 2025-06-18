@@ -1423,6 +1423,34 @@ function test_FSM_PatrolZone:test_setupSpeedSet()
   end
 
 
+  function test_FSM_PatrolZone:test_GoEngage() 
+    --mergeElements() called
+    --stack in element cleaned
+    --element set to FSM_Element_FlyFormation
+    --plane set to FSM_FlyOrbit
+    --plane task == zone:getTask()
+    --speed set to task.speed or 0
+    
+    local group = getCapGroup()
+    local m = mockagne.getMock()
+    local zone = OrbitTask:create({x = 0, y = 0})
+    local fsm = FSM_PatrolZone:create(group, zone)
+    local target = getTargetGroup()
+    target.getHighestThreat = function() return {MaxRange = 50000, MAR = 20000} end
+    target.getPoint = function() return {x = 0, y = 0, z = 0} end
+    group.mergeElements = m.mergeElements
+    group.needRTB = function ()
+      return false
+    end
+    group:setFSM(fsm)
+    group:setFSM_Arg("contacts", {target})
+
+    group:callFSM()
+    group:setFSM_Arg("contacts", {target})
+    group:callFSM()
+    group:setFSM_Arg("contacts", {target})
+
+  end
 --***************************************************************************
 --***************************************************************************
 --***************************************************************************

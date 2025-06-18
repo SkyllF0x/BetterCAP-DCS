@@ -2,7 +2,7 @@ utils = {}
 utils.generalID = 0 --used for internal purposes(i.e. zone ID or detector handler)
 utils.unitID = 0   -- for DCS UNIT
 utils.groupID = 0 --for DCS GROUP
-
+TRACE_ENABLED = true
 
 function utils.getGeneralID()
   utils.generalID = utils.generalID + 1
@@ -280,11 +280,16 @@ function utils.printToLog(...)
 end
 
 
-
 function utils.drawDebugCircle(data) 
   mist.marker.add(data)
 end
 
+
+function utils.getInProcected(func, ...)
+  local arg = {...}
+  local res, val = pcall(function() return func(unpack(arg)) end)
+  return val
+end
 
 ---Container whick allow call methods on all it's elements and support chaincalls
 utils.chainContainer = {}
@@ -308,7 +313,6 @@ function utils.chainContainer:create(arrayOfElements)
   setmetatable(instance, container)
   return instance
 end
-
 
 --tasks for DCS
 utils.tasks = {}
@@ -439,11 +443,13 @@ utils.WeaponTypes = {  --USES TYPENAME from getAmmo() DESC
   ["weapons.missiles.AIM-7E"] = {MaxRange = 42000, MAR = 18000},
   ["weapons.missiles.AIM-7MH"] = {MaxRange = 45000, MAR = 20000},
   ["weapons.missiles.AIM-7F"] = {MaxRange = 42000, MAR = 18000},
-  ["AIM_54C_Mk47"] = {MaxRange = 130000, MAR = 50000},
-  ["AIM_54A_Mk60"] = {MaxRange = 140000, MAR = 50000},
-  ["AIM_54A_Mk47"] = {MaxRange = 120000, MAR = 47000},
+  ["AIM_54C_Mk47"] = {MaxRange = 50000, MAR = 20000},
+  ["AIM_54A_Mk60"] = {MaxRange = 50000, MAR = 20000},
+  ["AIM_54A_Mk47"] = {MaxRange = 50000, MAR = 20000},
   ["weapons.missiles.AIM_120C"] = {MaxRange = 65000, MAR = 31000},
   ["weapons.missiles.AIM_120"] = {MaxRange = 55000, MAR = 27000},
+  ["AIM_120C"] = {MaxRange = 65000, MAR = 31000},
+  ["AIM_120"] = {MaxRange = 55000, MAR = 27000},
 }
 
 --return stub with R-60 when can't find missile in table
@@ -487,6 +493,14 @@ utils.PlanesTypes = {
   ["Su-33"] = {Missile = utils.WeaponTypes["P_27PE"], RadarRange = 90000},
   ["Su-30"] = {Missile = utils.WeaponTypes["P_27PE"], RadarRange = 110000},
   ["Su-34"] = {Missile = utils.WeaponTypes["P_27PE"], RadarRange = 110000},
+  ["Mirage-F1EE"] = {Missile = utils.WeaponTypes["weapons.missiles.AIM_7"], RadarRange = 50000},
+  ["Mirage-F1CE"] = {Missile = utils.WeaponTypes["weapons.missiles.AIM_7"], RadarRange = 50000},
+
+  --SU30 mod
+  ["Su-30SM"] = {Missile = utils.WeaponTypes["AIM_54A_Mk60"], RadarRange = 120000},
+  ["Su-30MKM"] = {Missile = utils.WeaponTypes["AIM_54A_Mk60"], RadarRange = 120000},
+  ["Su-30MKI"] = {Missile = utils.WeaponTypes["AIM_54A_Mk60"], RadarRange = 120000},
+  ["Su-30MKA"] = {Missile = utils.WeaponTypes["AIM_54A_Mk60"], RadarRange = 120000},
 }
 
 --return stub with R-60 when can't find aircraft in table

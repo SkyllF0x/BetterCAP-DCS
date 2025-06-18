@@ -235,13 +235,15 @@ GlobalLogger.settingsPrefab.allOn = {
 GlobalLogger.settingsPrefab.standart = {
   showPoints = false,                     --draw marks on F10 map
   outputInGame = false,                   --output messages to 3D
-  level = GlobalLogger.LEVELS.INFO,       --lowest level of message
+  outputInLog = true,                     --output messages to dcs.log
+  level = GlobalLogger.LEVELS.DEBUG,       --lowest level of message
   levelInGame = GlobalLogger.LEVELS.DEBUG,--lowest level to show message in game
 }
 
 GlobalLogger.settingsPrefab.allOff = {
   showPoints = true,                      --draw marks on F10 map
   outputInGame = true,                    --output messages to 3D
+  outputInLog = true,                     --output messages to dcs.log
   level = GlobalLogger.LEVELS.NOTHING,    --lowest level of message
   levelInGame = GlobalLogger.LEVELS.DEBUG,--lowest level to show message in game
 }
@@ -328,6 +330,21 @@ function GlobalLogger:error(message)
   end
   
   self:printToLog("ERROR: ", message)
+end
+
+function GlobalLogger:addToFile(message) 
+  if _G["io"] and _G["os"] and _G['lfs'] and
+    package.loaded["io"] and package.loaded["os"] and package.loaded["lfs"] then 
+    --packages not sanitized
+      local file = io.open("BetterCAP_DUMPS.txt", "a")
+      if not file then 
+        file = io.open("BetterCAP_DUMPS.txt", "w")
+        if not file then return end
+      end
+      file:write( "-----------------" ..tostring(timer.getAbsTime()) .. "-----------------" )
+      file:write(message)
+      file:close()
+  end
 end
 
 function GlobalLogger:drawPoint(data)

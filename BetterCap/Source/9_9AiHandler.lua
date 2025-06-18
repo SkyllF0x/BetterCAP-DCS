@@ -37,6 +37,14 @@ function AbstractMainloop:create(coalition)
   return setmetatable(instance, {__index = self, __eq = utils.compareTables})
 end
 
+function AbstractMainloop:createForBlue()
+  return AbstractMainloop:create(AbstractMainloop.coalition.BLUE)
+end
+
+function AbstractMainloop:createForRed()
+  return AbstractMainloop:create(AbstractMainloop.coalition.RED)
+end
+
 function AbstractMainloop:getDebugSettings()  
   return self.logger:getSettings()
 end
@@ -71,6 +79,7 @@ function AbstractMainloop:addRadar(radar)
   end
   
   self.detector:addRadar(self.radarClass:create(radar))
+  GlobalLogger:create():info("Added radar: " .. radar:getName())
 end
 
 --add ALL EW from coalition
@@ -79,6 +88,7 @@ function AbstractMainloop:addEWs()
     
     for _, unit in pairs(group:getUnits()) do 
       if unit:hasAttribute("EWR") then 
+          GlobalLogger:create():info("addEWs(): Add new EW: " .. unit:getName())
           self.detector:addRadar(self.radarClass:create(unit))
       end
     end
@@ -141,7 +151,7 @@ function AbstractMainloop:updateDetectorInProtected()
   
   if not result then 
     self.detectorErrors = self.detectorErrors + 1
-    GlobalLogger:create():error("AiHandler: error during detector update, traceback: \n" .. debug.traceback)
+    GlobalLogger:create():error("AiHandler: error during detector update, traceback: \n" .. mist.utils.serialize("", _err))
   else
     self.detectorErrors = 0
   end
@@ -182,7 +192,7 @@ function AbstractMainloop:spawnGroup(container)
       self.groups[group:getID()] = group
       self.groupErrors[group:getID()] = 0
       
-      GlobalLogger:create():info(group:getName() .. " activated with: " .. tostring(group:getOriginalSize()) .. " planes")
+      GlobalLogger:create():info(group:getName() .. " activated")
     end, debug.traceback)
 
   if not result then 
@@ -353,6 +363,90 @@ function GciCapHandler:create(coalition, groupLimit)
   instance.discardDamagedGroups = true
   
   return setmetatable(instance, {__index = self, __eq = utils.compareTables})
+end
+
+function GciCapHandler:createSqnFromPrefix(capGroupPrefix)
+  --search all cap group
+  local sqnCandidates = utils.getItemsByPrefix(coalition.getGroups(self.coalition, 0), capGroupPrefix)
+  for _, group in pairs(sqnCandidates) do 
+    local planeAmount = mist.random(2, 6)
+    local readyAmount = mist.random(2, planeAmount)
+    GlobalLogger:create():info("Create sqn for group: " .. group:getName() .. " with ready/all: " .. tostring(readyAmount) .. "/" .. tostring(planeAmount))
+    self:addSquadron(CapSquadron:create(group:getName(), readyAmount, planeAmount))
+  end
+end
+
+
+function GciCapHandler:addRandomizedObj(point, radius, zoneName)
+  GlobalLogger:create():info("Create Obj " .. zoneName)
+  local useForCap = false
+
+  if mist.random(4) == 1 then 
+    GlobalLogger:create():info(zoneName .. " will use Cap")
+    useForCap = true
+  end
+  local priority = mist.random(6)
+  if priority == 1 then 
+    priority = CapObjective.Priority.Low
+    GlobalLogger:create():info(zoneName .. " will low prioiry")
+  elseif priority == 2 then 
+    priority = CapObjective.Priority.Normal
+    GlobalLogger:create():info(zoneName .. " will high priority")
+  else
+    priority = CapObjective.Priority.Low
+    GlobalLogger:create():info(zoneName .. " will normal")
+  end
+
+  self:addObjective(CapObjective:create(point, CircleZone:create(point, radius), useForCap, true, priority, zoneName))
+end
+
+function GciCapHandler:addRandomizedObj2(ZONE, generateLow, generateHigh)
+  GlobalLogger:create():info("Create Obj from zone" .. ZONE)
+  local useForCap = false
+  if mist.random(4) == 1 then 
+    GlobalLogger:create():info(ZONE .. " will use Cap")
+    useForCap = true
+  end
+  local priority = mist.random(5)
+  if priority == 1 and generateLow then 
+    priority = CapObjective.Priority.Low
+    GlobalLogger:create():info(ZONE .. " will low prioiry")
+  elseif priority == 2 and generateHigh then 
+    priority = CapObjective.Priority.High
+    GlobalLogger:create():info(ZONE .. " will high priority")
+  else
+    priority = CapObjective.Priority.Normal
+    GlobalLogger:create():info(ZONE .. " will normal")
+  end
+
+  local zone = trigger.misc.getZone(ZONE)
+  self:addObjective(CapObjective:create(zone.point, CircleZone:create(zone.point, zone.radius), useForCap, true, priority, ZONE))
+end
+
+function GciCapHandler:_createDefence(coal, capGroupPrefix, zonePrefix)
+  capGroupPrefix = capGroupPrefix or "CAP"
+  zonePrefix = zonePrefix or "CAPZONE"
+
+  local handler = GciCapHandler:create(coal)
+  handler:createSqnFromPrefix(capGroupPrefix)
+
+  local i = 1
+  for name, zone in pairs(mist.DBs.zonesByName) do 
+    if string.find(name, zonePrefix) then 
+        handler:addRandomizedObj2(zone, true, true)
+        i = i + 1
+    end
+  end
+
+  if i == 1 then 
+    GlobalLogger:create():info("No zones was finded")
+
+    for _, sqn in pairs(handler:getSquadrones()) do 
+      handler:addRandomizedObj(sqn:getPoint(), mist.random(30*1852, 80*1852), sqn:getName())
+    end
+  end 
+
+  return handler
 end
 
 function GciCapHandler:setAirborneLimit(newVal)
@@ -667,6 +761,7 @@ function GciCapHandler:checkCap()
   end
 end
 
+
 function GciCapHandler:mainloop() 
   --update targets
   self:updateDetectorInProtected()
@@ -701,4 +796,12 @@ end
 
 function GciCapHandler:start() 
   timer.scheduleFunction(GciCapHandler.mainloopWrapper, self, timer.getTime()+1)
+end
+
+function GciCapHandler:createDefenceForRed(capPrefix, zonePrefix)
+  return GciCapHandler:_createDefence(GciCapHandler.coalition.RED)
+end
+
+function GciCapHandler:createDefenceForBlue(capPrefix, zonePrefix)
+  return GciCapHandler:_createDefence(GciCapHandler.coalition.BLUE)
 end

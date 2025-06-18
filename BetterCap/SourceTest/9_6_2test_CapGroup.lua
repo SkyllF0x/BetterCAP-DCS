@@ -1203,6 +1203,21 @@ function test_capGroup:test_checkTargets_notgtInRange()
   lu.assertNil(group:checkTargets(tbl).target)
 end
 
+function test_capGroup:test_checkTargets_notgtInRange() 
+  --we have target,  but distance > commitRange
+  local group = getCapGroup()
+  local target = getTargetGroup()
+  
+  --table from detector handler is dict where key is ID
+  local tbl = {[target:getID()] = target}
+  
+  target.getPoint = function() return {x = 10000, y = 0, z = 0} end
+
+  group.commitRange = 9000
+  
+  lu.assertNil(group:checkTargets(tbl).target)
+end
+
 function test_capGroup:test_checkTargets_returnTargetWithMaxPrority() 
   --we have target,  but distance > commitRange
   local group = getCapGroup()

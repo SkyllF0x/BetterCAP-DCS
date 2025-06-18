@@ -694,9 +694,9 @@ function CapGroup:updateAmmo()
     generalAmmo[IR] = generalAmmo[IR] + ammo[IR]
     
     --update missile
-    local m = plane:getBestMissile()
-    if m.MaxRange > self.missile.MaxRange then 
-      self.missile = m
+    local res, err = pcall(function() return plane:getBestMissile() end)
+    if res and err.MaxRange > self.missile.MaxRange then 
+      self.missile = err
     end
   end
   
@@ -725,13 +725,24 @@ function CapGroup:update()
   local elemPos = {}
   
   for _, elem in pairs(self.elements) do 
-    if elem:isExist() then 
-      aliveElems[#aliveElems+1] = elem
-      self.countPlanes = self.countPlanes + #elem.planes
-      
-      elem:update()
-      
-      elemPos[#elemPos + 1] = elem:getPoint()
+
+    local _res, _err = pcall(
+    function()
+      return elem:isExist()
+    end)
+
+    if _res and _err then 
+      local _r, _e = xpcall(function ()
+        elem:update()
+      end, debug.traceback)
+
+      if _r then 
+        aliveElems[#aliveElems+1] = elem
+        self.countPlanes = self.countPlanes + #elem.planes
+        elemPos[#elemPos + 1] = elem:getPoint()
+      else
+        GlobalLogger:create():error("Error in updating element " .. elem:getName() .. tostring(_e))
+      end
     else
       --element dead, verify target was cleared if present
       if elem:getCurrentFSM() == CapElement.FSM_Enum.FSM_Element_GroupEmul then 
@@ -809,23 +820,97 @@ function CapGroup:updateAutonomous(radars)
   end
 end
 
+function CapGroup:getDebugDump()
+  local result = {
+    name = utils.getInProcected(self.getName, self),
+    typeName = utils.getInProcected(self.getTypeName, self),
+    exist = utils.getInProcected(self.isExist, self),
+    airborne = utils.getInProcected(self.isAirborne, self),
+    landed = utils.getInProcected(self.isLanded, self),
+    engineOff = utils.getInProcected(self.isLanded, self),
+    autonomous = utils.getInProcected(self.getAutonomous, self),
+    point = mist.utils.deepCopy(utils.getInProcected(self.getPoint, self)),
+    stack = mist.utils.deepCopy(self.FSM_stack)
+  }
+  if self.target then 
+    result.target = {
+      name = utils.getInProcected(self.target.getName, self),
+      point = mist.utils.deepCopy(utils.getInProcected(self.target.getPoint, self)),
+      highestThread = mist.utils.deepCopy(utils.getInProcected(self.target.getHighestThreat, self))
+    }   
+  end
 
+  result.elements = {}
+  for _, elem in pairs(self.elements) do 
+    result.elements[#result.elements+1] = {
+      name = utils.getInProcected(elem.getName, self),
+      point = mist.utils.deepCopy(utils.getInProcected(elem.getPoint, self)),
+      exists = utils.getInProcected(elem.isExist, self),
+      topState = mist.utils.deepCopy(utils.getInProcected(elem.FSM_stack.getCurrentState, self))
+    }
+    
+  end
+
+  result.planes = {}
+  for _, plane in self:planes() do 
+    result.planes[#result.planes+1] = {
+      exist = utils.getInProcected(plane.isExist, self),
+      name = utils.getInProcected(plane.getName, self),
+      topState = mist.utils.deepCopy(utils.getInProcected(plane.FSM_stack.getCurrentState, self)),
+      point = mist.utils.deepCopy(utils.getInProcected(plane.getPoint, self))
+    }
+  end
+  return result
+end
 
 --call elements FSM
 function CapGroup:callElements()
   for _, element in pairs(self.elements) do
-    element:callFSM()
+    local _r, _e = xpcall(function() element:callFSM() end, debug.traceback)
+
+    if not _r then 
+      GlobalLogger:create():error(element:getName() .. " error in element fsm: \n" .. tostring(_e))
+      GlobalLogger:create():error(mist.utils.serializeWithCycles(element:getName() .. " dump", element:getDebugDump()))
+      GlobalLogger:create():addToFile(mist.utils.serializeWithCycles(element:getName() .. " dump", element:getDebugDump()))
+
+      --reset element fsm to first state
+      element.FSM_stack:unwind()
+    end
   end
 end
 
 function CapGroup:callFSM() 
-  self.FSM_stack:run(self.FSM_args)
+  local res, _err = xpcall(function() self.FSM_stack:run(self.FSM_args) end, debug.traceback)
   
+  if not res then 
+    GlobalLogger:create():error(self:getName() .. " error in group fsm call: \n" .. tostring(_err))
+    local dump = mist.utils.serializeWithCycles(self:getName() .. " dump", self:getDebugDump())
+    GlobalLogger:create():error(dump)
+    GlobalLogger:create():addToFile(dump)
+    --reset fsm to first state
+    self.FSM_stack:unwind()
+    --initialize with stub FSM
+    res, _err = pcall(function() self.FSM_stack:run(self.FSM_args) end, debug.traceback)
+
+    if not res then 
+      --CRITICAL ERROR
+      GlobalLogger:create():error(self:getName() .. " error in restart fsm: \n" .. tostring(_err))
+      dump = mist.utils.serializeWithCycles(self:getName() .. " restart dump", self:getDebugDump())
+      GlobalLogger:create():error(dump)
+      GlobalLogger:create():addToFile(dump)
+      --throw to mainloop handler
+      error("error in restart fsm")
+    end
+    return
+  end
+
   self:callElements()
   self.FSM_args = {
     radars = {},
     contacts = {}
     }
+
+    self.FSM_stack:resetCounter()
 end
 
 --check if entire group in air
@@ -1069,7 +1154,6 @@ function CapGroup:calculateCommitRange(target, aspect)
     return self.commitRange
   end
   
-  local targetRange, targetPos = target:getHighestThreat().MaxRange*0.75, target:getPoint()
   --new: go attack if inside maxRange(when target cold, or at calc commit range)
   local attackRange = self.missile.MaxRange*0.8
   local rangeDelta = self.commitRange - attackRange
@@ -1082,6 +1166,13 @@ end
 --or return target with most priority and if it inside one of commitZones
 --if finded target is ourTarget then return in if it inside commitRange + 20km
 function CapGroup:checkTargets(targetCandidates) 
+
+
+  local msg = self:getName() .. " CapGroup:checkTargets() called from " .. 
+    tostring(debug.getinfo(2).name) .. " " .. tostring(debug.getinfo(2).linedefined) 
+    .. "\n contacts: " .. tostring(targetCandidates) .. "\n FSM_Arg " .. tostring(self.FSM_args.contacts)
+  GlobalLogger:create():debug(msg)
+
   local emptyTable = {
       target = nil,
       priority = -math.huge,
@@ -1089,6 +1180,11 @@ function CapGroup:checkTargets(targetCandidates)
       commitRange = -10, --calculated commit range for target
       aspect = 180       --lowest aspect by getAspectFromElements()
     }
+
+  if targetCandidates == {} then 
+    GlobalLogger:create():debug(self:getName() .. " no target supplied")
+    return mist.utils.deepCopy(emptyTable) 
+  end
 
   local resultTarget = mist.utils.deepCopy(emptyTable)
   
@@ -1100,6 +1196,7 @@ function CapGroup:checkTargets(targetCandidates)
   end
   
   if not resultTarget.target then 
+    GlobalLogger:create():debug(self:getName() .. " no target finded")
     return emptyTable
   end
   
@@ -1111,14 +1208,20 @@ function CapGroup:checkTargets(targetCandidates)
   
   --return target if it inside one of commit Zones or inside commitRange and to close to route(if option set)
   local commitRange = self:calculateCommitRange(resultTarget.target, resultTarget.aspect)
-  
+  if(resultTarget.target == self.target) then 
+  GlobalLogger:create():debug(self:getName() .. " increase range")
+    commitRange = commitRange + 25000
+  end
+
   if (resultTarget.range < commitRange and inRouteArea)
     or self:checkInZones(resultTarget.target) then
     
     resultTarget.commitRange = commitRange
+    GlobalLogger:create():debug(self:getName() .. " target is " .. tostring(resultTarget.target))
     return resultTarget
   end
   
+  GlobalLogger:create():debug(self:getName() .. " no target pass check")
   return emptyTable
 end
 
@@ -1135,11 +1238,18 @@ function CapGroup:getDetectedTargets()
   
   for _, plane in self:planes() do 
     for __, contact in pairs(plane:getDetectedTargets()) do 
-      --return only alive and aircraft
-      if contact.object and contact.object:isExist() and contact.object:hasAttribute("Air") then
-        result[nbr] = TargetContainer:create(contact, plane)
-        nbr = nbr + 1
-        end
+      
+      local result, err = xpcall(function()
+        --return only alive and aircraft
+        if contact.object and contact.object:isExist() and contact.object:hasAttribute("Air") then
+          result[nbr] = TargetContainer:create(contact, plane)
+          nbr = nbr + 1
+          end
+        end, debug.traceback)
+
+      if not result then 
+          GlobalLogger:create():error(" CapGroup:getDetectedTargets bad contact: " .. tostring(err))
+      end
       end
     end
     
@@ -1232,16 +1342,23 @@ function CapGroup:getDetectedTargetsWithChecks()
   for _, plane in self:planes() do 
     for __, contact in pairs(plane:getDetectedTargets()) do 
       
-      if contact.object and contact.object:isExist() and contact.object:hasAttribute("Air")
-        and land.isVisible(contact.object:getPoint(), ourPos) --CHECK LOS
-        and mist.utils.get3DDist(contact.object:getPoint(), ourPos) < self.radarRange
-        and self:calculateAOB(contact.object:getPoint(), plane) < 90 then --target in front of aircraft
-          
-        result[nbr] = TargetContainer:create(contact, plane)
-        nbr = nbr + 1
-        end
+      local res, err = xpcall(function ()
+        
+        if contact.object and contact.object:isExist() and contact.object:hasAttribute("Air")
+          and land.isVisible(contact.object:getPoint(), ourPos) --CHECK LOS
+          and mist.utils.get3DDist(contact.object:getPoint(), ourPos) < self.radarRange
+          and self:calculateAOB(contact.object:getPoint(), plane) < 90 then --target in front of aircraft
+            
+          result[nbr] = TargetContainer:create(contact, plane)
+          nbr = nbr + 1
+          end
+        end, debug.traceback)
+      
+      if not res then 
+        GlobalLogger:create():error(" CapGroup:getDetectedTargetsWithChecks bad contact: " .. tostring(err))
       end
     end
+  end
     
     return result
 end

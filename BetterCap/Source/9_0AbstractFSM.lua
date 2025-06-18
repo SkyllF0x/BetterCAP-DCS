@@ -39,6 +39,8 @@ function AbstractState:teardown() end
 ----------------------------------------------------
 
 FSM_Stack = {}
+FSM_Stack.MAX_SIZE = 50
+FSM_Stack.MAX_CHANGES = 75
 
 function FSM_Stack:create()
   local instance = {}
@@ -46,6 +48,7 @@ function FSM_Stack:create()
   instance.data = {}
   --pointer on top of the stack
   instance.topItem = 0
+  instance.stateChanges = 0
   return setmetatable(instance, {__index = self})
 end
 
@@ -55,6 +58,7 @@ function FSM_Stack:clear()
     self.data[i]:teardown()
   end 
   
+  self.stateChanges = self.stateChanges + 1
   self.topItem = 0
 end
 
@@ -63,7 +67,17 @@ end
 --calls FSM_state:setup() so state will be properly configured
 function FSM_Stack:push(FSM_state)
   self.topItem = self.topItem + 1
-  
+  self.stateChanges = self.stateChanges + 1
+
+  if self.stateChanges > self.MAX_CHANGES then 
+    self.stateChanges = 0
+    error("reach max state changes " .. self:getCurrentState().object:getName())
+  end
+
+  if self.topItem > FSM_Stack.MAX_SIZE then 
+    self.topItem = 1
+    error("STACK SIZE EXCECEED")
+  end
   self.data[self.topItem] = FSM_state
   self.data[self.topItem]:setup()
 end
@@ -71,6 +85,12 @@ end
 --delete item from top of the stack
 --calls setup() so new active state will be properly configured
 function FSM_Stack:pop() 
+  self.stateChanges = self.stateChanges + 1
+  
+  if self.stateChanges > self.MAX_CHANGES then 
+    self.stateChanges = 0
+    error("reach max state changes " .. self:getCurrentState().object:getName())
+  end
   --check if stack already empty
   if self.topItem == 1 then 
     return
@@ -94,7 +114,18 @@ function FSM_Stack:getCurrentState()
 --Runs FSM state from top of the stack
 --also guaranties arg ~= nil
 function FSM_Stack:run(arg) 
+  
   self.data[self.topItem]:run(arg or {})
+end
+
+function FSM_Stack:resetCounter()
+  self.stateChanges = 0
+end
+
+function FSM_Stack:unwind()
+  if self.topItem > 0 then
+    self.topItem = 1
+  end
 end
 
 --static function to print stack

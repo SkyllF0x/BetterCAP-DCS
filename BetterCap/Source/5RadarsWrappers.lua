@@ -57,12 +57,19 @@ function RadarWrapper:getDetectedTargets()
   local result = {}
   
   for _, contact in pairs(self:getController():getDetectedTargets(1, 2, 4, 16)) do 
-      if contact.object and contact.object:isExist() and contact.object:hasAttribute("Air") then
-          result[#result+1] = TargetContainer:create(contact, self)
-        end
-    end --VISUAL/OPTIC/RADAR/RWR
-    
-    return result
+      
+      local _res, _err = xpcall(function ()
+        
+        if contact.object and contact.object:isExist() and contact.object:hasAttribute("Air") then
+            result[#result+1] = TargetContainer:create(contact, self)
+          end
+      end, --VISUAL/OPTIC/RADAR/RWR
+      debug.traceback)
+    if not _res then 
+      GlobalLogger:create():warning("RadarWrapper: Error when contack processing" .. mist.utils.serialize("\n traceback", _err))
+    end
+  end
+  return result
 end
 
 --return true if point inside detection range
@@ -100,14 +107,21 @@ function RadarWrapperWithChecks:getDetectedTargets()
   local result = {}
   local ourPos = self:getPoint()
   
-  for _, contact in pairs(self:getController():getDetectedTargets(1, 2, 4, 16)) do 
-    --this will add target only if it has clear LOS and distance < self.detectionRange * 1.5
+  for _, contact in pairs(self:getController():getDetectedTargets(1, 2, 4, 16)) do  
+      
+    local _res,_err = xpcall(function ()
+      --this will add target only if it has clear LOS and distance < self.detectionRange * 1.5
       if contact.object and contact.object:isExist() and contact.object:hasAttribute("Air") 
         and land.isVisible(contact.object:getPoint(), ourPos) --CHECK LOS
         and mist.utils.get3DDist(contact.object:getPoint(), ourPos) < self.detectionRange * 1.5 then --check range
           result[#result+1] = TargetContainer:create(contact, self)
-        end
-    end --VISUAL/OPTIC/RADAR/RWR
-    
+      end
+    end, 
+    debug.traceback)
+
+    if not _res then 
+      GlobalLogger:create():warning("RadarWrapperWithChecks: Error when contack processing" .. mist.utils.serialize("\n traceback", _err))
+    end
+  end
     return result
 end

@@ -141,7 +141,8 @@ function CapSquadronAir:create(prototypeGroupName, aircraftReady, aircraftAvail,
   instance.speed = 230 --speed on route and in hold in m/s 
   
   instance.priority = priority or CapSquadronAir.Priority.NORMAL
-  
+  instance.alr = CapGroup.ALR.Normal
+
   instance.combatRadius = combatRadius or 300000 --default 160nm
   --how many aircraft squdron have
   instance.aircraftCounter = aircraftAvail or 10
@@ -187,6 +188,11 @@ function CapSquadronAir:generateObjective(R)
     local radius = R or 200000
     local pos = mist.utils.deepCopy(self:getPoint())--can corrupt point when creates
     return CapObjective:create(pos, CircleZone:create(pos, radius), false, true, nil, self:getName() .. "-home")
+end
+
+function CapSquadronAir:setALR(alr)
+  GlobalLogger:create():info(self:getName() .. " setALR() " .. tostring(alr))
+  self.alr = alr
 end
 
 function CapSquadronAir:setPriority(priority) 

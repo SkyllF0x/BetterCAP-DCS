@@ -1791,12 +1791,12 @@ function test_SkateAttackChecks:test_SkateSingleElementNormalCycle()
   element1:setFSM_NoCall(state1)
   --element1:setFSM_NoCall(FSM_Element_Pump:create(element1, state1))
   
-  --stage1: inside MAR, target HOT continue pump
+  --stage1: inside MAR, target HOT Attack
   target.getAA = function() return 0 end
   
   mockTimer()
   element1:callFSM({})
-  lu.assertEquals(element1:getCurrentFSM(), CapElement.FSM_Enum.FSM_Element_Pump)
+  lu.assertEquals(element1:getCurrentFSM(), CapElement.FSM_Enum.FSM_Element_Attack)
   
   --stage2: target cold, still in MAR, continues
   target.getAA = function() return 180 end
@@ -1804,14 +1804,7 @@ function test_SkateAttackChecks:test_SkateSingleElementNormalCycle()
   
   mockTimer()
   element1:callFSM({})
-  lu.assertEquals(element1:getCurrentFSM(), CapElement.FSM_Enum.FSM_Element_Pump)
-
-  --stage4: 5 miles from mar, target hot continue
-  plane1.getPoint = function() return {x = target:getHighestThreat().MAR + 5*1850, y = 0, z = 0} end
-  
-  mockTimer()
-  element1:callFSM({})
-  lu.assertEquals(element1:getCurrentFSM(), CapElement.FSM_Enum.FSM_Element_Pump)
+  lu.assertEquals(element1:getCurrentFSM(), CapElement.FSM_Enum.FSM_Element_Attack)
   
   --stage5: distance from mar ok, target hot turn hot, distance to great for Attack go intercept
   plane1.getPoint = function() return {x = element1:getBestMissile().MaxRange + 10000, y = 0, z = 0} end

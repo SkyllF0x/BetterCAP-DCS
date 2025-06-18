@@ -291,6 +291,7 @@ function AbstractSquadronContainer:setSettings(group)
   )
   group:setTactics(self.sqn.preferredTactics)
   group:setGoLiveThreshold(self.sqn.goLiveThreshold)
+  group:setALR(self.sqn.alr)
 end
 
 function AbstractSquadronContainer:getObjective() 

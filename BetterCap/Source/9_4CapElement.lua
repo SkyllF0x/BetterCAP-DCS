@@ -69,7 +69,17 @@ function CapElement:isExist()
   local newTbl = {}
   
   for _, plane in pairs(self.planes) do 
-    if plane:isExist() then 
+
+    local _res, _err = xpcall(
+      function ()
+        return plane:isExist()
+      end,
+    debug.traceback)
+    
+    if not _res then
+      GlobalLogger:create():error(self:getName() .. " erron in isExist(): " .. tostring(_err))
+    end
+    if _res and _err then 
       newTbl[#newTbl+1] = plane
     end
   end
@@ -170,7 +180,14 @@ end
 
 function CapElement:callPlanes() 
   for _, plane in pairs(self.planes) do 
-    plane:callFSM()
+    local res, val = xpcall(function() plane:callFSM() end, debug.traceback)
+
+    if not res then 
+      GlobalLogger:create():error("error in plane FSM " .. plane:getName() .. " traceback:\n" .. tostring(val))
+      local msg = mist.utils.serializeWithCycles(plane:getName() .. " dump", plane:getDebugDump())
+      GlobalLogger:create():error(msg)
+      GlobalLogger:create():addToFile(msg)
+    end
   end
 end
 
@@ -179,4 +196,38 @@ function CapElement:callFSM()
 
   self:callPlanes()
   self.FSM_args = {}
+  self.FSM_stack:resetCounter()
+end
+
+function CapElement:getDebugDump()
+  local result = {}
+  result.isExist = utils.getInProcected(self.isExist, self)
+  result.point = mist.utils.deepCopy(utils.getInProcected(self.getPoint, self))
+  result.name = utils.getInProcected(self.getName, self)
+  result.missile = mist.utils.deepCopy(utils.getInProcected(self.getBestMissile, self))
+  result.stack = mist.utils.deepCopy(self.FSM_stack)
+  if self:getSecondElement() then
+    local e = self:getSecondElement()
+    result.otherElement = {
+      point = mist.utils.deepCopy(utils.getInProcected(e.getPoint, self)),
+      name = utils.getInProcected(e.getName, self),
+      exist = utils.getInProcected(e.isExist, self),
+      stackTop = mist.utils.deepCopy(utils.getInProcected(e.FSM_Stack.getCurrentState, self))
+    }
+  end
+
+  result.planes = {}
+  for _, plane in pairs(self.planes) do 
+    result.planes[#result.planes+1] = {}
+    if utils.getInProcected(plane.isExist, self) then 
+      result.planes[#result.planes] = {
+        name = utils.getInProcected(plane.getName, self),
+        point = mist.utils.deepCopy(utils.getInProcected(plane.getPoint, self)),
+        stackTop = mist.utils.deepCopy(utils.getInProcected(plane.FSM_Stack.getCurrentState, self)),
+        ammo = mist.utils.deepCopy(utils.getInProcected(plane.getAmmo, self))
+      }
+    end
+  end
+
+return result
 end

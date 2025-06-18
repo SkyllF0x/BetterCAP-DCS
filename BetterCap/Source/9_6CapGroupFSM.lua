@@ -64,6 +64,7 @@ function FSM_GroupChecks:create(handledGroup)
 end
 
 function FSM_GroupChecks:checkAttack(contacts) 
+
   local tgt = self.object:checkTargets(contacts)
   
   if not tgt.target then 
@@ -118,6 +119,7 @@ end
 --return true if change state is occured
 --also checks updateAutonomous
 function FSM_GroupChecks:groupChecks(arg) 
+
   --firstly check for RTB
   if self.object:needRTB() then 
     --go RTB
@@ -671,6 +673,7 @@ function FSM_Engaged:run(arg)
   self.object:splitElement()
   
   local tgt = self.object:checkTargets(arg.contacts)
+
   if not tgt.target then 
     --no target for commit
     GlobalLogger:create():info(self.object:getName() .. " FSM_Engaged: exit, no more targets")

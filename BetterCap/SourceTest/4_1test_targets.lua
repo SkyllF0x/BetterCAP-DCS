@@ -121,8 +121,6 @@ function test_target:test_shotEvent_noCoalition()
 
   lu.assertEquals(target.shooter, false)
   verify(mock.getTarget(any()))
-  verify(mock.getCoalition(target.dcsObject))
-  verify(mock.getCoalition(unit))
 end
   
 function test_target:test_shotEvent_attackNeutral() 
@@ -146,14 +144,15 @@ function test_target:test_shotEvent_attackNeutral()
 
   lu.assertEquals(target.shooter, false)
   verify(mock.getTarget(any()))
-  verify(mock.getCoalition(target.dcsObject))
-  verify(mock.getCoalition(unit))
 end
 
 function test_target:test_shotEvent_shooter() 
   local target, unit, weapon, mock = self:getTarget(), Unit:create(),Weapon:create(), mockagne.getMock()
   
   weapon.getTarget = mock.getTarget
+  weapon.getDesc = function ()
+    return {category = Weapon.Category.MISSILE}
+  end
   when(mock.getTarget(any())).thenAnswer(unit)
   
   unit.getCoalition = mock.getCoalition

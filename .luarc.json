@@ -1,9 +1,0 @@
-{
-    "$schema": "https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json",
-    "runtime.version": "Lua 5.1",
-    "workspace.ignoreDir": [
-      ".vscode", "3rdParty", "BetterCap/BetterCap_Compiled.lua"
-    ],
-    "workspace.library": ["3rdParty", "DCS_Stubs"],
-    "diagnostics.libraryFiles": "Disable"
-  }

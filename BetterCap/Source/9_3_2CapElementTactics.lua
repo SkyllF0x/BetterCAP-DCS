@@ -119,7 +119,7 @@ function FSM_Element_Tactic:inDefending()
       return false
       end
     end
-    
+
   return true
 end
 
@@ -157,13 +157,16 @@ end
 
 --return lowest distance from plane to target
 function FSM_Element_Tactic:distanceToTarget() 
-  
   return self.distance2Target
 end
 
 --distance to MAR of targetGroup highest threat, return negative if inside mar
 function FSM_Element_Tactic:distanceToMar() 
-  return self.distance2Mar
+  if self.object.myGroup.alr == CapGroup.ALR.Normal then
+    return self.distance2Mar
+  end
+
+  return self.distance2Target
 end
 
 function FSM_Element_Tactic:getAA() 
@@ -419,6 +422,7 @@ function FSM_Element_Skate:checkCondition()
   if not self:checkRequrements(self:getTargetGroup():getHighestThreat().MaxRange, 
     self.object:getBestMissile().MaxRange) then 
     
+      GlobalLogger:create():debug(debug.getinfo(1).name .. " " .. tostring(debug.getinfo(1).linedefined) .. " checkCondition() true")
     --switch tactic
     self.object:setFSM(FSM_Element_SkateOffset:create(self.object))
     return true

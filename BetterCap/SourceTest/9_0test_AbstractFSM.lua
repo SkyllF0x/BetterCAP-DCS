@@ -106,13 +106,25 @@ function test_FSMStack:test_getStateEnumerator()
   lu.assertEquals(obj:getStateEnumerator(), obj.data[obj.topItem].enumerator)
 end
 
-function test_FSMStack:test_getCurrentState() 
+function test_FSMStack:test_overflow() 
   local obj = FSM_Stack:create()
-  obj:push(AbstractState:create())
-  
-  lu.assertTable(obj:getCurrentState())
-  lu.assertEquals(obj:getCurrentState(), obj.data[obj.topItem])
-  end
+  local state = AbstractState:create()
+  local state2 = AbstractState:create()
 
+  state.object = Unit:create()
+  state2.object =  Unit:create()
+  state.run = function ()
+    obj:push(state2)
+    obj:run()
+  end
+  state2.run = function ()
+    obj:pop()
+    obj:run()
+
+  end
+  
+  obj:push(state)
+  obj:run({})
+end
 local runner = lu.LuaUnit.new()
 runner:runSuite()
